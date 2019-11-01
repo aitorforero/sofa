@@ -1,6 +1,11 @@
 #ifndef SOFAIO_DEFINED
 #define SOFAIO_DEFINED
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+
+    
+
     typedef struct {
         int pin;      /**< Pin pulsador abrir */
         bool pulsado;     /**< Pin pulsador cerrar*/
