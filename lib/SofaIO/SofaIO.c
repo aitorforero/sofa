@@ -19,13 +19,13 @@ static QueueHandle_t event_queue = NULL;
 
 static void IRAM_ATTR button_isr_handler(void* arg){
     sofaio_boton_t* boton = (sofaio_boton_t *) arg;
-    boton->pulsado = (gpio_get_level(BUTTON_GPIO) == 1);
+    boton->pulsado = (gpio_get_level(boton->pin) == 1);
 
     BaseType_t woken;
     xQueueSendToBackFromISR(event_queue, boton, woken);
 
     if(woken){
-      taskYIELD_FROM_ISR();
+      taskYIELD_FROM_ISR(arg);
     }
 }
 

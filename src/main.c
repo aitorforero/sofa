@@ -48,5 +48,19 @@ static QueueHandle_t events;
 
 void app_main(void){
     printf("Empiezo!\n");
+
+    events = xQueueCreate(10,sizeof(sofaio_boton_t));
+
     sofaIO_init(&sofa, events);
+    
+    sofaio_boton_t *element;
+
+    for(;;){
+        if(xQueueReceive(events, &element, portMAX_DELAY)) {
+            printf("Pulsado\n");
+        }
+    }
+    
+
+
 }
