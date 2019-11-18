@@ -9,13 +9,14 @@ sofaio_sofa_t sofa = {
     .asiento_derecha = {
         .boton_abrir = {
             .pin = GPIO_NUM_16,
-            .pulsado = false        },
+            .pulsado = false
+        },
         .boton_cerrar =  {
             .pin = GPIO_NUM_4,
             .pulsado = false
         },
         .motor_abrir = GPIO_NUM_27,
-        .motor_cerrar = GPIO_NUM_14 
+        .motor_cerrar = GPIO_NUM_14
     },
     .asiento_centro = {
         .boton_abrir =  {
@@ -27,7 +28,7 @@ sofaio_sofa_t sofa = {
             .pulsado = false
         },
         .motor_abrir = GPIO_NUM_25,
-        .motor_cerrar = GPIO_NUM_26 
+        .motor_cerrar = GPIO_NUM_26
     },
     .asiento_izquierda = {
         .boton_abrir =  {
@@ -39,7 +40,7 @@ sofaio_sofa_t sofa = {
             .pulsado = false
         },
         .motor_abrir = GPIO_NUM_32,
-        .motor_cerrar = GPIO_NUM_33 
+        .motor_cerrar = GPIO_NUM_33
     }
 };
 
@@ -52,7 +53,7 @@ void app_main(void){
     events = xQueueCreate(10,sizeof(sofaio_boton_t));
 
     sofaIO_init(&sofa, events);
-    
+
     sofaio_boton_t *element;
 
     for(;;){
@@ -60,7 +61,7 @@ void app_main(void){
             printf("Pulsado\n");
         }
     }
-    
+
 
 
 }

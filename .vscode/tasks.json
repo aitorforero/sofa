@@ -1,0 +1,19 @@
+{
+   "tasks": [
+      {
+         "type": "PlatformIO",
+         "task": "Build",
+         "problemMatcher": []
+      },
+      {
+         "type": "PlatformIO",
+         "task": "Upload",
+         "problemMatcher": []
+      },
+      {
+         "type": "PlatformIO",
+         "task": "Monitor",
+         "problemMatcher": []
+      }
+   ]
+}

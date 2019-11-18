@@ -14,18 +14,18 @@
 
 
 static QueueHandle_t event_queue = NULL;
-
+ 
 
 
 static void IRAM_ATTR button_isr_handler(void* arg){
     sofaio_boton_t* boton = (sofaio_boton_t *) arg;
     boton->pulsado = (gpio_get_level(boton->pin) == 1);
 
-    BaseType_t woken;
+    BaseType_t woken = pdFALSE;
     xQueueSendToBackFromISR(event_queue, boton, woken);
 
     if(woken){
-      taskYIELD_FROM_ISR(arg);
+      portYIELD_FROM_ISR();
     }
 }
 
@@ -78,7 +78,7 @@ static void sofaIO_inicializa_entradas(sofaio_sofa_t* sofa) {
 
 void sofaIO_init(sofaio_sofa_t* sofa, QueueHandle_t events) {
     event_queue = events;
-    sofaIO_inicializa_salidas(sofa);    
+    sofaIO_inicializa_salidas(sofa);
     sofaIO_inicializa_entradas(sofa);
     printf("OK\n");
 }
