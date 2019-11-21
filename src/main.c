@@ -58,6 +58,8 @@ void app_main(void){
 
     for(;;){
         if(xQueueReceive(events, &element, portMAX_DELAY)) {
+            element->pulsado = (gpio_get_level(element->pin) == 0); // esta pull up
+
             gpio_set_level(sofa.asiento_derecha.motor_abrir, !sofa.asiento_derecha.boton_abrir.pulsado);  
             gpio_set_level(sofa.asiento_derecha.motor_cerrar, !sofa.asiento_derecha.boton_cerrar.pulsado);
             gpio_set_level(sofa.asiento_centro.motor_abrir, !sofa.asiento_centro.boton_abrir.pulsado);  
