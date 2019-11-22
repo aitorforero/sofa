@@ -5,6 +5,7 @@
 #include "esp_system.h"
 #include "driver/gpio.h"
 
+
 #include "SofaIO.h"
 
 #define LED_GPIO 18
@@ -19,7 +20,7 @@ static QueueHandle_t event_queue = NULL;
 
 static void IRAM_ATTR button_isr_handler(void* arg){
     BaseType_t woken = pdFALSE;
-    xQueueSendToBackFromISR(event_queue, &arg, woken);
+    xQueueSendToBackFromISR(event_queue, arg, woken);
 
     if(woken){
       portYIELD_FROM_ISR();

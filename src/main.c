@@ -1,9 +1,11 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "driver/gpio.h"
+
 #include <stdio.h>
 #include <SofaIO.h>
 
+static const char *TAG = "SOFA_MAIN";
 
 sofaio_sofa_t sofa = {
     .asiento_derecha = {
@@ -45,19 +47,28 @@ sofaio_sofa_t sofa = {
 };
 
 
-static QueueHandle_t events;
+
+
+static QueueHandle_t buttonEvents;
+
+
+
+
+
 
 void app_main(void){
     printf("Empiezo!\n");
 
-    events = xQueueCreate(10,sizeof(sofaio_boton_t));
+    nvs_flash_init();
 
-    sofaIO_init(&sofa, events);
+    buttonEvents = xQueueCreate(10,sizeof(sofaio_boton_t));
+
+    sofaIO_init(&sofa, buttonEvents);
 
     sofaio_boton_t *element;
 
     for(;;){
-        if(xQueueReceive(events, &element, portMAX_DELAY)) {
+        if(xQueueReceive(buttonEvents, &element, portMAX_DELAY)) {
             element->pulsado = (gpio_get_level(element->pin) == 0); // esta pull up
 
             gpio_set_level(sofa.asiento_derecha.motor_abrir, !sofa.asiento_derecha.boton_abrir.pulsado);  
