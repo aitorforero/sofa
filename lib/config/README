@@ -1,0 +1,8 @@
+// Esta es un plantilla para el header de configuracion
+
+#ifndef CONFIG_DEFINED
+#define CONFIG_DEFINED
+    #define CONFIG_BROKER_URL ""
+    #define CONFIG_SSID ""
+    #define CONFIG_PASSWORD ""
+#endif

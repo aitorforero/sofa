@@ -1,9 +1,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
+#include "freertos/task.h"
 #include "driver/gpio.h"
-
+#include "nvs_flash.h"
+#include "esp_log.h"
 #include <stdio.h>
 #include <SofaIO.h>
+#include <Wifi.h>
+#include <mqtt.h> 
 
 static const char *TAG = "SOFA_MAIN";
 
@@ -49,7 +53,7 @@ sofaio_sofa_t sofa = {
 
 
 
-static QueueHandle_t buttonEvents;
+
 
 
 
@@ -57,27 +61,24 @@ static QueueHandle_t buttonEvents;
 
 
 void app_main(void){
-    printf("Empiezo!\n");
+    ESP_LOGI(TAG, "Empiezo");
 
     nvs_flash_init();
+    sofaIO_init(&sofa);
+    wifi_init();
+    mqtt_app_start();
 
-    buttonEvents = xQueueCreate(10,sizeof(sofaio_boton_t));
-
-    sofaIO_init(&sofa, buttonEvents);
-
-    sofaio_boton_t *element;
+    ESP_LOGI(TAG, "Comienzo el bucle");
 
     for(;;){
-        if(xQueueReceive(buttonEvents, &element, portMAX_DELAY)) {
-            element->pulsado = (gpio_get_level(element->pin) == 0); // esta pull up
+        gpio_set_level(sofa.asiento_derecha.motor_abrir, !sofa.asiento_derecha.boton_abrir.pulsado);  
+        gpio_set_level(sofa.asiento_derecha.motor_cerrar, !sofa.asiento_derecha.boton_cerrar.pulsado);
+        gpio_set_level(sofa.asiento_centro.motor_abrir, !sofa.asiento_centro.boton_abrir.pulsado);  
+        gpio_set_level(sofa.asiento_centro.motor_cerrar, !sofa.asiento_centro.boton_cerrar.pulsado);
+        gpio_set_level(sofa.asiento_izquierda.motor_abrir, !sofa.asiento_izquierda.boton_abrir.pulsado);  
+        gpio_set_level(sofa.asiento_izquierda.motor_cerrar, !sofa.asiento_izquierda.boton_cerrar.pulsado);
 
-            gpio_set_level(sofa.asiento_derecha.motor_abrir, !sofa.asiento_derecha.boton_abrir.pulsado);  
-            gpio_set_level(sofa.asiento_derecha.motor_cerrar, !sofa.asiento_derecha.boton_cerrar.pulsado);
-            gpio_set_level(sofa.asiento_centro.motor_abrir, !sofa.asiento_centro.boton_abrir.pulsado);  
-            gpio_set_level(sofa.asiento_centro.motor_cerrar, !sofa.asiento_centro.boton_cerrar.pulsado);
-            gpio_set_level(sofa.asiento_izquierda.motor_abrir, !sofa.asiento_izquierda.boton_abrir.pulsado);  
-            gpio_set_level(sofa.asiento_izquierda.motor_cerrar, !sofa.asiento_izquierda.boton_cerrar.pulsado);
-        }
+        vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 
 

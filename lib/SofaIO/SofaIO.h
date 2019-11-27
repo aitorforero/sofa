@@ -1,12 +1,7 @@
-#ifndef SOFAIO_DEFINED
+#ifndef SOFAIO_DEFINED 
 #define SOFAIO_DEFINED
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
-
     
-
-    typedef struct {
+   typedef struct {
         int pin;      /**< Pin pulsador abrir */
         bool pulsado;     /**< Pin pulsador cerrar*/
     } sofaio_boton_t;
@@ -24,5 +19,5 @@
         sofaio_asiento_t asiento_izquierda; /**< asiento izquierda */
     } sofaio_sofa_t;
 
-    void sofaIO_init(sofaio_sofa_t* sofa, QueueHandle_t events);
+    void sofaIO_init(sofaio_sofa_t* sofa);
 #endif

@@ -1,11 +1,40 @@
 
 #include "freertos/FreeRTOS.h"
-#include "freertos/esp_err.h"
 #include "freertos/event_groups.h"
+#include "esp_err.h"
+#include "esp_event.h"
+#include "esp_wifi.h"
+#include "esp_log.h"
+#include "tcpip_adapter.h"
+#include "esp_event_loop.h"
 
+#include "config.h"
 #include "Wifi.h"
 
+static const int CONNECTED_BIT = BIT0;
+static const char *TAG = "SOFA_WIFI";
+
 static EventGroupHandle_t wifi_event_group;
+
+static esp_err_t wifi_event_handler(void *ctx, system_event_t *event)
+{
+    switch (event->event_id) {
+        case SYSTEM_EVENT_STA_START:
+            esp_wifi_connect();
+            break;
+        case SYSTEM_EVENT_STA_GOT_IP:
+            xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
+
+            break;
+        case SYSTEM_EVENT_STA_DISCONNECTED:
+            esp_wifi_connect();
+            xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
+            break;
+        default:
+            break;
+    }
+    return ESP_OK;
+}
 
 void wifi_init(void)
 {
@@ -17,13 +46,13 @@ void wifi_init(void)
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
     wifi_config_t wifi_config = {
         .sta = {
-            .ssid = CONFIG_WIFI_SSID,
-            .password = CONFIG_WIFI_PASSWORD,
-        },
+            .ssid = CONFIG_SSID,
+            .password = CONFIG_PASSWORD
+        }
     };
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
-    ESP_LOGI(TAG, "start the WIFI SSID:[%s]", CONFIG_WIFI_SSID);
+    ESP_LOGI(TAG, "start the WIFI SSID:[%s]", wifi_config.sta.ssid);
     ESP_ERROR_CHECK(esp_wifi_start());
     ESP_LOGI(TAG, "Waiting for wifi");
     xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
