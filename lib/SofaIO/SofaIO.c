@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
@@ -77,8 +76,8 @@ static void sofaIO_inicializa_entradas(sofaio_sofa_t* sofa) {
   gpio_isr_handler_add(sofa->asiento_derecha.boton_cerrar.pin, button_isr_handler, (void*) &(sofa->asiento_derecha.boton_cerrar));
 }
 
-void sofaIO_init(sofaio_sofa_t* sofa, QueueHandle_t events) {
-    event_queue = events;
+void sofaIO_init(sofaio_sofa_t* sofa) {
+    event_queue = xQueueCreate(10,sizeof(sofaio_boton_t));
     sofaIO_inicializa_salidas(sofa);
     sofaIO_inicializa_entradas(sofa);
     printf("OK\n");
