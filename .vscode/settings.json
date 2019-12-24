@@ -9,6 +9,8 @@
         "semphr.h": "c",
         "tcpip_adapter.h": "c",
         "esp_attr.h": "c",
-        "esp_system.h": "c"
+        "esp_system.h": "c",
+        "initwifistate.h": "c",
+        "task.h": "c"
     }
 }

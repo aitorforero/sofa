@@ -1,6 +1,6 @@
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
+#include "freertos/queue.h"
 #include "esp_err.h"
 #include "esp_event.h"
 #include "esp_wifi.h"
@@ -9,26 +9,30 @@
 #include "esp_event_loop.h"
 
 #include "config.h"
+#include "stateMachine.h"
 #include "Wifi.h"
 
 static const int CONNECTED_BIT = BIT0;
 static const char *TAG = "SOFA_WIFI";
 
+static QueueHandle_t stateMachineEventQueue;
+
 static EventGroupHandle_t wifi_event_group;
 
 static esp_err_t wifi_event_handler(void *ctx, system_event_t *event)
 {
+    event_t evento;
     switch (event->event_id) {
         case SYSTEM_EVENT_STA_START:
             esp_wifi_connect();
             break;
         case SYSTEM_EVENT_STA_GOT_IP:
             xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
-
+            raise(wifi_conectado);
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
-            esp_wifi_connect();
             xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
+            raise(wifi_desconectado);
             break;
         default:
             break;
@@ -36,8 +40,10 @@ static esp_err_t wifi_event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
-void wifi_init(void)
+void wifi_init(QueueHandle_t events)
 {
+    stateMachineEventQueue = events;
+
     tcpip_adapter_init();
     wifi_event_group = xEventGroupCreate();
     ESP_ERROR_CHECK(esp_event_loop_init(wifi_event_handler, NULL));

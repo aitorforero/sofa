@@ -1,4 +1,7 @@
 #ifndef  WIFI_DEFINED
 #define WIFI_DEFINED
-    void wifi_init(void);
+    #include "freertos/FreeRTOS.h"
+    #include "freertos/queue.h"
+
+    void wifi_init(QueueHandle_t events);
 #endif
