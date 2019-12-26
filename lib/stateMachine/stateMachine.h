@@ -3,36 +3,41 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
-
 #include "homieDevice.h"
 
 typedef enum
 {
-    boton_abrir_pulsado,
-    boton_abrir_levantado,
-    boton_cerrar_pulsado,
-    boton_cerrar_levantado,
-    wifi_conectado,
-    wifi_desconectado,
-    mqtt_conectado,
-    mqtt_desconectado,
-    mqtt_mensaje_abrir,
-    mqtt_mensaje_cerrar,
-    mqtt_mensaje_parar,
-    mqtt_suscrito,
-    last_event
+    asiento_derecha = 0x000,
+    asiento_centro = 0x010,
+    asiento_izquierda = 0x020,
+
+    boton_abrir_pulsado = 0x000,
+    boton_abrir_levantado = 0x001,
+    boton_cerrar_pulsado = 0x002,
+    boton_cerrar_levantado = 0x003,
+    mqtt_mensaje_abrir = 0x004,
+    mqtt_mensaje_cerrar = 0x005,
+    mqtt_mensaje_parar = 0x006,
+
+    wifi_desconectado = 0x100,
+    wifi_conectado = 0x101,
+
+    mqtt_desconectado = 0x200,
+    mqtt_conectado = 0x201,
+    mqtt_suscrito = 0x202,
 } event_t;
 
 typedef enum
 {
-    init_wifi,
-    init_mqtt,
-    init_device,
     idle,
     abrir_manual,
     cerrar_manual,
     abrir_auto,
     cerrar_auto,
+    init_wifi,
+    init_mqtt,
+    init_device,
+    conectado,
     last_state
 } state_name_t;
 
@@ -53,6 +58,11 @@ typedef struct state_s
     enter_function_t enter;
     exit_function_t exit;
 } state_t;
+
+class asiento_satate {
+    
+};
+
 
 
 void stateMachine_init(QueueHandle_t eventQueue, homie_device *device);
