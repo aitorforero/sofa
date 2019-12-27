@@ -29,17 +29,23 @@ typedef enum
 
 typedef enum
 {
-    idle,
-    abrir_manual,
-    cerrar_manual,
-    abrir_auto,
-    cerrar_auto,
     init_wifi,
     init_mqtt,
     init_device,
     conectado,
     last_state
 } state_name_t;
+
+
+typedef enum
+{
+    idle,
+    abrir_manual,
+    cerrar_manual,
+    abrir_auto,
+    cerrar_auto,
+    last_asiento_state
+} asiento_state_name_t;
 
 
 QueueHandle_t machineEvents;
@@ -59,9 +65,20 @@ typedef struct state_s
     exit_function_t exit;
 } state_t;
 
-class asiento_satate {
-    
-};
+struct asiento_state_s;
+
+typedef void (*asiento_handle_function_t)(event_t, struct asiento_state_s*, struct asiento_state_s**);
+typedef void (*asiento_enter_function_t)(struct asiento_state_s*);
+typedef void (*asiento_exit_function_t)(struct asiento_state_s*);
+
+
+typedef struct asiento_state_s
+{
+    asiento_state_name_t nombre;
+    asiento_handle_function_t handle;
+    asiento_enter_function_t enter;
+    asiento_exit_function_t exit;
+} asiento_state_t;
 
 
 
