@@ -3,6 +3,7 @@
 
 #include <stdbool.h> 
 
+    const char *HOMIE_DEVICE_SUBSCRIBE_TOPIC = "%s/%s/#";
     const char *HOMIE_DEVICE_HOMIE_TOPIC = "%s/%s/$homie";
     const char *HOMIE_DEVICE_NAME_TOPIC = "%s/%s/$name";
     const char *HOMIE_DEVICE_STATE_TOPIC = "%s/%s/$state";

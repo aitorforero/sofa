@@ -22,7 +22,7 @@ void mqtt_publish(char* topic, char* data){
     ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
 };
 
-void mqtt_suscribe(char* topic){
+void mqtt_subscribe(char* topic){
     int msg_id;
     msg_id = esp_mqtt_client_subscribe(client, topic, 0);
     ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
@@ -36,20 +36,17 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
     switch (event->event_id) {
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-            machineEvent = mqtt_conectado;
-            xQueueSendToBack(stateMachineEventQueue, &machineEvent, 0);
+            raise(mqtt_conectado);
             break;
 
         case MQTT_EVENT_DISCONNECTED:
             ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
-            machineEvent = mqtt_desconectado;
-            xQueueSendToBack(stateMachineEventQueue, &machineEvent, 0);
+            raise(mqtt_desconectado);
             break;
 
         case MQTT_EVENT_SUBSCRIBED:
             ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-            machineEvent = mqtt_suscrito;
-            xQueueSendToBack(stateMachineEventQueue, &machineEvent, 0);
+            raise(mqtt_suscrito);
             break;
 
         case MQTT_EVENT_UNSUBSCRIBED:
@@ -62,7 +59,7 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
             ESP_LOGI(TAG, "MQTT_EVENT_DATA");
             printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
             printf("DATA=%.*s\r\n", event->data_len, event->data);
-
+            raise_mqtt(event->topic, event->data);
             
             break;
         case MQTT_EVENT_ERROR:

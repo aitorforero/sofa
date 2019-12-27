@@ -1,9 +1,14 @@
 #include "config.h"
-#include "initWifiState.h"
-#include "initMqttState.h"
-#include "initDeviceState.h"
 #include "mqtt.h"
 #include "homieDevice.h"
+
+#include "initWifiState.h"
+#include "initMqttState.h"
+#include "conectadoState.h"
+#include "initDeviceState.h"
+
+
+
 
 
 
@@ -81,14 +86,20 @@ static void publishDevice(){
     }
 }
 
+static void subscribe(){
+    snprintf(topic, 256, HOMIE_DEVICE_SUBSCRIBE_TOPIC, CONFIG_ROOT_TOPIC, machineDevice->deviceID);
+    mqtt_subscribe(topic);
+};
+
+
 
 static void initDeviceState_handle(event_t event, state_t **new_state) {
     *new_state = &initDeviceState;
 
     switch (event)
     {
-        case mqtt_conectado:
-            *new_state = &initDeviceState;
+        case mqtt_suscrito:
+            *new_state = &conectadoState;
             break;
         
         case mqtt_desconectado:
@@ -105,14 +116,15 @@ static void initDeviceState_handle(event_t event, state_t **new_state) {
 }
 
 static void initDeviceState_enter(void) {
-    
+    publishDevice();
+    subscribe();
 }
 
 static void initDeviceState_exit(void) {
     
 }
 
-state_t initWifiState = {
+state_t initDeviceState = {
     .nombre = init_device,
     .handle = &initDeviceState_handle,
     .enter = &initDeviceState_enter,

@@ -34,7 +34,7 @@ static void initMqttState_exit(void) {
     
 }
 
-state_t initWifiState = {
+state_t initMqttState = {
     .nombre = init_mqtt,
     .handle = &initMqttState_handle,
     .enter = &initMqttState_enter,

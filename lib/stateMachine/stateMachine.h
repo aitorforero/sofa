@@ -25,6 +25,8 @@ typedef enum
     mqtt_desconectado = 0x200,
     mqtt_conectado = 0x201,
     mqtt_suscrito = 0x202,
+
+    evento_no_valido = 0xFFF
 } event_t;
 
 typedef enum
@@ -51,6 +53,21 @@ typedef enum
 QueueHandle_t machineEvents;
 homie_device *machineDevice;
 
+struct asiento_state_s;
+
+typedef void (*asiento_handle_function_t)(event_t, asiento, struct asiento_state_s**);
+typedef void (*asiento_enter_function_t)(struct asiento_state_s*);
+typedef void (*asiento_exit_function_t)(struct asiento_state_s*);
+
+
+typedef struct asiento_state_s
+{
+    asiento_state_name_t nombre;
+    asiento_handle_function_t handle;
+    asiento_enter_function_t enter;
+    asiento_exit_function_t exit;
+} asiento_state_t;
+
 struct state_s;
 
 typedef void (*handle_function_t)(event_t, struct state_s**);
@@ -64,23 +81,6 @@ typedef struct state_s
     enter_function_t enter;
     exit_function_t exit;
 } state_t;
-
-struct asiento_state_s;
-
-typedef void (*asiento_handle_function_t)(event_t, struct asiento_state_s*, struct asiento_state_s**);
-typedef void (*asiento_enter_function_t)(struct asiento_state_s*);
-typedef void (*asiento_exit_function_t)(struct asiento_state_s*);
-
-
-typedef struct asiento_state_s
-{
-    asiento_state_name_t nombre;
-    asiento_handle_function_t handle;
-    asiento_enter_function_t enter;
-    asiento_exit_function_t exit;
-} asiento_state_t;
-
-
 
 void stateMachine_init(QueueHandle_t eventQueue, homie_device *device);
 void raise(event_t event);
