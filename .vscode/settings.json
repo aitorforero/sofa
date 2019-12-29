@@ -17,5 +17,8 @@
         "string_view": "c",
         "initmqttstate.h": "c",
         "idlestate.h": "c"
-    }
+    },
+    "plantuml.exportFormat": "svg",
+    "plantuml.server": "https://www.plantuml.com/plantuml",
+    "plantuml.render": "PlantUMLServer"
 }

@@ -62,9 +62,9 @@
     } homie_node;
 
     typedef struct {
+        char* name;    
         char* deviceID;
         char* version; 
-        char* name;    
         homie_node* nodes;
     } homie_device;
 

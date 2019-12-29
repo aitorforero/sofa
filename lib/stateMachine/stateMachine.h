@@ -50,7 +50,7 @@ typedef enum
 } asiento_state_name_t;
 
 
-QueueHandle_t machineEvents;
+QueueHandle_t machineEvents; 
 homie_device *machineDevice;
 
 struct asiento_state_s;
