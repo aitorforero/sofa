@@ -64,12 +64,12 @@ static const char *TAG = "SOFA_MAIN";
 
 // state_t *currentState;
 
-QueueHandle_t stateMachineEventQueue;
+// QueueHandle_t stateMachineEventQueue;
 
-Asiento derecha(GPIO_NUM_16, GPIO_NUM_4, GPIO_NUM_27, GPIO_NUM_14);
-Asiento centro(GPIO_NUM_18, GPIO_NUM_17, GPIO_NUM_25, GPIO_NUM_26);
-Asiento izquierda(GPIO_NUM_21, GPIO_NUM_19, GPIO_NUM_32, GPIO_NUM_33);  
-Sofa sofa(&derecha, &centro, &izquierda, stateMachineEventQueue);
+// Asiento derecha(GPIO_NUM_16, GPIO_NUM_4, GPIO_NUM_27, GPIO_NUM_14);
+// Asiento centro(GPIO_NUM_18, GPIO_NUM_17, GPIO_NUM_25, GPIO_NUM_26);
+// Asiento izquierda(GPIO_NUM_21, GPIO_NUM_19, GPIO_NUM_32, GPIO_NUM_33);  
+// Sofa sofa(&derecha, &centro, &izquierda, stateMachineEventQueue);
 
 
 extern "C" void app_main(void){
