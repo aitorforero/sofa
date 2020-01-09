@@ -73,7 +73,7 @@ static const char *TAG = "SOFA_MAIN";
 
 
 extern "C" void app_main(void){
-    ESP_LOGI(TAG, "Empiezo");
+    ESP_LOGI(TAG, "Empiezo!!");
 
     nvs_flash_init();
 
