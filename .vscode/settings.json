@@ -16,7 +16,9 @@
         "string": "c",
         "string_view": "c",
         "initmqttstate.h": "c",
-        "idlestate.h": "c"
+        "idlestate.h": "c",
+        "functional": "cpp",
+        "complex": "cpp"
     },
     "plantuml.exportFormat": "svg",
     "plantuml.server": "https://www.plantuml.com/plantuml",

@@ -1,0 +1,140 @@
+@startuml ertewrt
+hide empty description
+state fork_sin_wifi <<join>>
+state fork_sin_mqtt <<join>>
+state sin_wifi
+state sin_mqtt
+state anunciar
+state conectado {
+    state idle
+    state cerrar_automatico
+    state cerrar_manual
+    state abrir_automatico
+    state abrir_manual
+    [*] -right-> idle
+    idle --> abrir_automatico : mqtt_abrir
+    idle --> cerrar_automatico : mqtt_cerrar
+    idle --> abrir_manual : boton_abrir_pulsado
+    idle --> cerrar_manual : boton_cerrar_pulsado
+    abrir_manual -up-> idle : boton_abrir_soltado
+    abrir_manual -up-> idle : boton_cerrar_pulsado
+    cerrar_manual -up-> idle : boton_abrir_pulsado
+    cerrar_manual -up-> idle : boton_cerrar_soltado
+    abrir_automatico -up-> idle : mqtt_parar
+    abrir_automatico -right-> cerrar_automatico : mqtt_cerrar
+    cerrar_automatico -up-> idle : mqtt_parar
+    cerrar_automatico -left-> abrir_automatico : mqtt_abir
+}
+[*] -right-> sin_wifi
+fork_sin_wifi -down-> sin_wifi
+fork_sin_mqtt -up-> sin_mqtt
+sin_wifi -right-> sin_mqtt : wifi_conectado
+sin_mqtt -up-> fork_sin_wifi : wifi_desconectado
+sin_mqtt -right-> anunciar : mqtt_conectado
+anunciar -down-> fork_sin_mqtt : mqtt_desconectado
+anunciar -up-> fork_sin_wifi : wifi_desconectado
+anunciar -right-> conectado  : mqtt_suscrito
+conectado -down-> fork_sin_mqtt : mqtt_desconectado
+conectado -up-> fork_sin_wifi : wifi_desconectado
+
+@enduml
+
+@startuml ertewrtd
+enum SofaEvents {
+   SofaEvents_WifiConectado 
+   WifiDesconectado
+   MqttConectado
+   MqttDesconectado
+   MqttSuscrito
+}
+
+enum SofaStateNames {
+    SofaStateNames_SinWifi
+    SofaStateNames_SinMqtt
+    SofaStateNames_Anunciar
+    SofaStateNames_Conectado
+}
+
+namespace Homie {
+    enum dataType {
+        Integer 
+        Float 
+        Boolean 
+        String
+        Enum
+        Color
+    }
+
+    enum deviceState {
+        Init
+        Ready
+        Disconnected
+        Sleeping
+        Lost
+        Alert
+    } 
+
+
+
+    class Device {
+        +char name    
+        +char deviceID
+        +char version
+    }
+
+    class Node {
+        +char nodeID
+        +char name
+        +char nodetype
+        void getPropertyNames(char propertyNames, size_t size)
+    }
+
+    class Property {
+        +char propertyID;
+        +char name; 
+        +dataType datatype;    
+        +char format;
+        +bool settable;
+        +bool retained;
+        +char unit;
+        +char initialValue;
+    }
+    Device o-- "*" Node : +nodes
+    Node o-- "*" Property : +properties
+}
+
+class Sofa 
+
+class Asiento {
+    +void abrir()
+    +void cerrar()
+    +void parar()
+}
+
+class SofaStateContext
+SofaStateContext o.. Sofa
+
+class SofaStateMachine {
+    +void handle(Event e)
+}
+SofaStateMachine o-- SofaState : # current
+
+class SofaState {
+    + {static} getInstance(SofaStateContext context)
+    + {abstract} SofaStateNames getName()
+    + {abstract} void enter()
+    + {abstract} State* handle(Event e)
+    + {abstract} void exit()
+}
+SofaState o-- SofaStateContext : # context
+
+class SinWifi {
+
+}
+Sofa*--Asiento : +derecha
+Sofa*--Asiento : +centro
+Sofa*--Asiento : +izquierda
+ 
+
+SofaState <|-- SinWifi
+@enduml
