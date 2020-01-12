@@ -1,0 +1,8 @@
+// Esta es un plantilla para el header de configuracion
+
+#pragma once
+
+#define CONFIG_BROKER_URL ""
+#define CONFIG_SSID ""
+#define CONFIG_PASSWORD ""
+#define CONFIG_ROOT_TOPIC ""

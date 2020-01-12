@@ -1,7 +1,10 @@
 #pragma once
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
+#include "freertos/event_groups.h"
+
 #include "sofa_asiento.hpp"
+#include "sofa_state_machine.hpp"
 
 class SofaEventArgs;
 
@@ -10,9 +13,9 @@ class Sofa {
         Asiento* _derecha;
         Asiento* _centro;
         Asiento* _izquierda;
-        QueueHandle_t _state_machine_event_queue;
-
+        gpio_num_t _pin_led_OK;
         QueueHandle_t event_queue;
+        EventGroupHandle_t wifi_event_group;
 
         SofaEventArgs* _derecha_abrir_event_args;
         SofaEventArgs* _derecha_cerrar_event_args;
@@ -21,17 +24,27 @@ class Sofa {
         SofaEventArgs* _izquierda_abrir_event_args;
         SofaEventArgs* _izquierda_cerrar_event_args;
 
+        SofaStateMachine* state_machine;
+
         void inicializa_salidas();
         void inicializa_entradas();
         
     public:
-        Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, QueueHandle_t state_machine_event_queue);
+        Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_led_OK);
         ~Sofa();
         Asiento* getDerecha();
         Asiento* getCentro();
         Asiento* getIzquierda();
         void onButtonPressed(gpio_num_t pin, BaseType_t* woken);
         void buttonTask();
+        void encenderOK();
+        void apagarOK();
+
+        SofaStateMachine* getStateMachine();
+
+        void wifi_init();
+        void setConnectedBit();
+        void clearConnectedBit();
 };
 
 class SofaEventArgs {

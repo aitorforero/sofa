@@ -10,17 +10,17 @@ Asiento::Asiento(gpio_num_t pin_boton_abrir, gpio_num_t pin_boton_cerrar, gpio_n
 
 void Asiento::abrir(){
     this->parar();
-    gpio_set_level(this->_pin_motor_abrir, 1);  
+    gpio_set_level(this->_pin_motor_abrir, 0);  
 };
 
 void Asiento::cerrar(){
     this->parar();
-    gpio_set_level(this->_pin_motor_cerrar, 1);
+    gpio_set_level(this->_pin_motor_cerrar, 0);
 };
 
 void Asiento::parar(){
-    gpio_set_level(this->_pin_motor_abrir, 0);  
-    gpio_set_level(this->_pin_motor_cerrar, 0);
+    gpio_set_level(this->_pin_motor_abrir, 1);  
+    gpio_set_level(this->_pin_motor_cerrar, 1);
 };
 
 gpio_num_t Asiento::getPinBotonAbrir(){ return this->_pin_boton_abrir;};
