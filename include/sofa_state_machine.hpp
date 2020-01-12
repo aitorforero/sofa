@@ -102,3 +102,13 @@ class SofaStateSinMQTT:public SofaState {
     public:
         SofaStateSinMQTT(Sofa* sofa):SofaState(sofa, SIN_WIFI){};
 };
+
+class SofaStateAnunciando:public SofaState {
+    public:
+        SofaStateAnunciando(Sofa* sofa):SofaState(sofa, ANUNCIANDO){};
+};
+
+class SofaStateConectado:public SofaState {
+    public:
+        SofaStateConectado(Sofa* sofa):SofaState(sofa, CONECTADO){};
+};

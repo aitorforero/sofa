@@ -6,6 +6,7 @@
 
 #include "sofa_asiento.hpp"
 #include "sofa_sofa.hpp"
+#include "sofa_homie_device.hpp"
 
 // #include "homieDevice.h"
 // #include "Wifi.h"
@@ -69,47 +70,62 @@ Asiento centro(GPIO_NUM_18, GPIO_NUM_17, GPIO_NUM_25, GPIO_NUM_26);
 Asiento izquierda(GPIO_NUM_21, GPIO_NUM_19, GPIO_NUM_32, GPIO_NUM_33);  
 Sofa* sofa;
 
+HomieProperty* stateProperty;
+HomieNode* asientoDerechaNode;
+HomieNode* asientoCentroNode;
+HomieNode* asientoIzquierdaNode;
+HomieDevice* sofaDevice;
+
+
+void inicializarHomieDevice() {
+    stateProperty = new HomieProperty();
+    stateProperty->propertyID = "state";
+    stateProperty->name = "State";
+    stateProperty->datatype = HOMIE_DATATYPE_ENUM;
+    stateProperty->format = "UP,DOWN,STOP";
+    stateProperty->settable = true;
+    stateProperty->retained = true;
+    stateProperty->unit = "";
+    stateProperty->initialValue = "STOP";
+
+    asientoDerechaNode = new HomieNode();
+    asientoDerechaNode->nodeID = "ad",
+    asientoDerechaNode->name = "Asiento derecha",
+    asientoDerechaNode->nodetype = "asiento",
+    asientoDerechaNode->properties = new HomieProperty[1];
+    asientoDerechaNode->properties[0] =  *stateProperty;
+
+    asientoCentroNode = new HomieNode();
+    asientoCentroNode->nodeID = "ac",
+    asientoCentroNode->name = "Asiento centro",
+    asientoCentroNode->nodetype = "asiento",
+    asientoCentroNode->properties = new HomieProperty[1];
+    asientoCentroNode->properties[0] =  *stateProperty;
+
+    asientoIzquierdaNode = new HomieNode();
+    asientoIzquierdaNode->nodeID = "ai",
+    asientoIzquierdaNode->name = "Asiento izquierda",
+    asientoIzquierdaNode->nodetype = "asiento",
+    asientoIzquierdaNode->properties = new HomieProperty[1];
+    asientoIzquierdaNode->properties[0] =  *stateProperty;
+
+    sofaDevice = new HomieDevice();
+    sofaDevice->deviceID = "A4CF126C25BC";
+    sofaDevice->name = "Sofa sala";
+    sofaDevice->version = "4.0";
+    sofaDevice->nodes = new HomieNode[3]; 
+    sofaDevice->nodes[0] = *asientoDerechaNode;
+    sofaDevice->nodes[1] = *asientoCentroNode;
+    sofaDevice->nodes[2] = *asientoIzquierdaNode;
+}
 
 extern "C" void app_main(void){
     ESP_LOGI(TAG, "Empiezo!");
 
     nvs_flash_init();
 
-    sofa = new Sofa(&derecha, &centro, &izquierda, GPIO_NUM_23);
+    inicializarHomieDevice();
 
+    sofa = new Sofa(&derecha, &centro, &izquierda, GPIO_NUM_23, sofaDevice);
     sofa->encenderOK();
-    // // inicializo la cola de eventos
-    // stateMachineEventQueue = xQueueCreate(10,sizeof(event_t));
-    // stateMachine_init(stateMachineEventQueue, &device);
-
-    // currentState = &initWifiState;
-    // currentState->enter();
-
-    // ESP_LOGI(TAG, "Comienzo el bucle");
-
-    // for(;;){
-    //     event_t receivedEvent;
-    //     state_t *newState = currentState;
-    //     if(xQueueReceive(stateMachineEventQueue, &receivedEvent, 0)){
-    //         currentState->handle(receivedEvent, &newState);
-    //         if(newState->nombre!=currentState->nombre){
-    //             // Hay que cambiar de estado                                                                                                           
-    //             currentState->exit();
-    //             currentState = newState;
-    //             currentState->enter();
-    //         }
-
-    //     // gpio_set_level(sofa.asiento_derecha.motor_abrir, !sofa.asiento_derecha.boton_abrir.pulsado);  
-    //     // gpio_set_level(sofa.asiento_derecha.motor_cerrar, !sofa.asiento_derecha.boton_cerrar.pulsado);
-    //     // gpio_set_level(sofa.asiento_centro.motor_abrir, !sofa.asiento_centro.boton_abrir.pulsado);  
-    //     // gpio_set_level(sofa.asiento_centro.motor_cerrar, !sofa.asiento_centro.boton_cerrar.pulsado);
-    //     // gpio_set_level(sofa.asiento_izquierda.motor_abrir, !sofa.asiento_izquierda.boton_abrir.pulsado);  
-    //     // gpio_set_level(sofa.asiento_izquierda.motor_cerrar, !sofa.asiento_izquierda.boton_cerrar.pulsado);
-
-    //         vTaskDelay(10 / portTICK_PERIOD_MS);
-    //     }
-    // }
-
-
-
 }

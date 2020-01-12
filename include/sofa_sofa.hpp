@@ -2,9 +2,11 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/event_groups.h"
+#include "mqtt_client.h"
 
 #include "sofa_asiento.hpp"
 #include "sofa_state_machine.hpp"
+#include "sofa_homie_device.hpp"
 
 class SofaEventArgs;
 
@@ -14,8 +16,12 @@ class Sofa {
         Asiento* _centro;
         Asiento* _izquierda;
         gpio_num_t _pin_led_OK;
+        HomieDevice* _sofaDevice;
+
         QueueHandle_t event_queue;
         EventGroupHandle_t wifi_event_group;
+        esp_mqtt_client_handle_t client;
+
 
         SofaEventArgs* _derecha_abrir_event_args;
         SofaEventArgs* _derecha_cerrar_event_args;
@@ -30,7 +36,7 @@ class Sofa {
         void inicializa_entradas();
         
     public:
-        Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_led_OK);
+        Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_led_OK, HomieDevice* _sofaDevice);
         ~Sofa();
         Asiento* getDerecha();
         Asiento* getCentro();
@@ -45,6 +51,10 @@ class Sofa {
         void wifi_init();
         void setConnectedBit();
         void clearConnectedBit();
+
+        void mqtt_app_start();
+        void mqtt_publish(char* topic, char* data);
+        void mqtt_subscribe(char* topic);
 };
 
 class SofaEventArgs {

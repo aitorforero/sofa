@@ -13,10 +13,12 @@
 #include "esp_log.h"
 #include "tcpip_adapter.h"
 #include "esp_event_loop.h"
+#include "mqtt_client.h"
 
 #include "sofa_asiento.hpp"
 #include "sofa_sofa.hpp"
 #include "sofa_state_machine.hpp"
+#include "sofa_homie_device.hpp"
 
 static const int CONNECTED_BIT = BIT0;
 
@@ -39,8 +41,7 @@ static void button_task( void * pvParameters ){
   sofa->buttonTask();
 }
 
-esp_err_t wifi_event_handler(void *ctx, system_event_t *event)
-{
+esp_err_t wifi_event_handler(void *ctx, system_event_t *event){
     ESP_LOGI(TAG, "Evento WIFI");
     Sofa* sofa = (Sofa*)ctx;
 
@@ -60,11 +61,56 @@ esp_err_t wifi_event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
-Sofa::Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_led_OK): _derecha(derecha),  _centro(centro), _izquierda(izquierda), _pin_led_OK(pin_led_OK){
+static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event){
+    int msg_id;
+    
+    Sofa* sofa = (Sofa*)event->user_context;
+
+    switch (event->event_id) {
+        case MQTT_EVENT_CONNECTED:
+            ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
+            sofa->getStateMachine()->onEvent((sofa_event_flags)(SOFA_EVENT_MQTT_FLAG | SOFA_EVENT_CONECTADO_FLAG));
+            break;
+
+        case MQTT_EVENT_DISCONNECTED:
+            ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
+            sofa->getStateMachine()->onEvent((sofa_event_flags)(SOFA_EVENT_MQTT_FLAG | SOFA_EVENT_DESCONECTADO_FLAG));
+            break;
+
+        case MQTT_EVENT_SUBSCRIBED:
+            ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
+            sofa->getStateMachine()->onEvent((sofa_event_flags)(SOFA_EVENT_MQTT_FLAG | SOFA_EVENT_SUSCRITO_FLAG));
+            break;
+
+        case MQTT_EVENT_UNSUBSCRIBED:
+            ESP_LOGI(TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
+            break;
+        case MQTT_EVENT_PUBLISHED:
+            ESP_LOGI(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
+            break;
+        case MQTT_EVENT_DATA:
+            ESP_LOGI(TAG, "MQTT_EVENT_DATA");
+            printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
+            printf("DATA=%.*s\r\n", event->data_len, event->data);
+            //raise_mqtt(event->topic, event->data);
+            
+            break;
+        case MQTT_EVENT_ERROR:
+            ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
+            break;
+        default:
+            ESP_LOGI(TAG, "Other event id:%d", event->event_id);
+            break;
+    }
+    return ESP_OK;
+}
+
+Sofa::Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_led_OK, HomieDevice* sofaDevice): _derecha(derecha),  _centro(centro), _izquierda(izquierda), _pin_led_OK(pin_led_OK),_sofaDevice(sofaDevice){
   ESP_LOGI(TAG, "Inicializando sofa...");
 
   event_queue = xQueueCreate(10,sizeof(int));
 
+ 
   this->_derecha_abrir_event_args = new SofaEventArgs(this, this->getDerecha()->getPinBotonAbrir());
   this->_derecha_cerrar_event_args = new SofaEventArgs(this, this->getDerecha()->getPinBotonCerrar());
   this->_centro_abrir_event_args = new SofaEventArgs(this, this->getCentro()->getPinBotonAbrir());
@@ -253,3 +299,26 @@ void Sofa::clearConnectedBit(){
   xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
   state_machine->onEvent((sofa_event_flags)(SOFA_EVENT_WIFI_FLAG | SOFA_EVENT_DESCONECTADO_FLAG));
 };
+
+void Sofa::mqtt_app_start()
+{
+    esp_mqtt_client_config_t mqtt_cfg = {};
+    mqtt_cfg.event_handle = mqtt_event_handler;
+    mqtt_cfg.uri = CONFIG_BROKER_URL;
+    mqtt_cfg.user_context = this;
+
+    client = esp_mqtt_client_init(&mqtt_cfg);
+    esp_mqtt_client_start(client);
+}
+
+void Sofa::mqtt_publish(char* topic, char* data){
+    int msg_id;
+    msg_id = esp_mqtt_client_publish(client, topic, data, 0, 1, 1);    
+    ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
+};
+
+void Sofa::mqtt_subscribe(char* topic){
+    int msg_id;
+    msg_id = esp_mqtt_client_subscribe(client, topic, 0);
+    ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
+}
