@@ -8,62 +8,8 @@
 #include "sofa_sofa.hpp"
 #include "sofa_homie_device.hpp"
 
-// #include "homieDevice.h"
-// #include "Wifi.h"
-// #include "mqtt.h" 
-// #include "stateMachine.h"
-// #include "initWifiState.h"
 
 static const char *TAG = "SOFA_MAIN";
-
-
-
-// homie_property asiento_properties[1] = 
-// {
-//     {
-//         .propertyID = "state",
-//         .name = "State",
-//         .datatype = Enum,
-//         .format = "UP,DOWN,STOP",
-//         .settable = true,
-//         .retained = true,
-//         .unit = "",
-//         .initialValue = "STOP"
-//     }
-// };
-
-// homie_node asientos[3] =
-// {
-//     {
-//         .nodeID = "ad",
-//         .name = "Asiento derecha",
-//         .nodetype = "asiento",
-//         .properties =  asiento_properties
-//     },
-//     {
-//         .nodeID = "ac",
-//         .name = "Asiento centro",
-//         .nodetype = "asiento",
-//         .properties =  asiento_properties
-//     },
-//     {
-//         .nodeID = "ai",
-//         .name = "Asiento izquierda",
-//         .nodetype = "asiento",
-//         .properties =  asiento_properties
-//     }
-// };
-
-// homie_device device = 
-// {
-//     .version = "4.0",
-//     .deviceID = "A4CF126C25BC",
-//     .name = "Sofa sala",
-//     .nodes = asientos
-// };
-
-
-// state_t *currentState;
 
 Asiento derecha(GPIO_NUM_16, GPIO_NUM_4, GPIO_NUM_27, GPIO_NUM_14);
 Asiento centro(GPIO_NUM_18, GPIO_NUM_17, GPIO_NUM_25, GPIO_NUM_26);

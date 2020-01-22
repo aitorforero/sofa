@@ -1,4 +1,5 @@
 #pragma once
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
@@ -101,11 +102,14 @@ class SofaStateSinWifi:public SofaState {
 class SofaStateSinMQTT:public SofaState {
     public:
         SofaStateSinMQTT(Sofa* sofa):SofaState(sofa, SIN_WIFI){};
+        void enter();
+        sofa_state_name handle(sofa_event_flags event);
 };
 
 class SofaStateAnunciando:public SofaState {
     public:
         SofaStateAnunciando(Sofa* sofa):SofaState(sofa, ANUNCIANDO){};
+        
 };
 
 class SofaStateConectado:public SofaState {

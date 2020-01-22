@@ -1,6 +1,44 @@
 #include <string.h>
 #include "sofa_homie_device.hpp"
 
+// Global defines 
+const char *HOMIE_DEVICE_SUBSCRIBE_TOPIC = "%s/%s/#";
+const char *HOMIE_DEVICE_HOMIE_TOPIC = "%s/%s/$homie";
+const char *HOMIE_DEVICE_NAME_TOPIC = "%s/%s/$name";
+const char *HOMIE_DEVICE_STATE_TOPIC = "%s/%s/$state";
+const char *HOMIE_DEVICE_EXTENSIONS_TOPIC = "%s/%s/$extensions";
+const char *HOMIE_DEVICE_NODES_TOPIC = "%s/%s/$nodes";
+
+const char *HOMIE_NODE_NAME_TOPIC = "%s/%s/%s/$name";
+const char *HOMIE_NODE_TYPE_TOPIC = "%s/%s/%s/$type";
+const char *HOMIE_NODE_PROPERTIES_TOPIC = "%s/%s/%s/$properties";
+
+const char *HOMIE_PROPERTY_VALUE_TOPIC = "%s/%s/%s/%s";
+const char *HOMIE_PROPERTY_NAME_TOPIC = "%s/%s/%s/%s/$name";
+const char *HOMIE_PROPERTY_DATATYPE_TOPIC = "%s/%s/%s/%s/$datatype";
+const char *HOMIE_PROPERTY_FORMAT_TOPIC = "%s/%s/%s/%s/$format";
+const char *HOMIE_PROPERTY_SETTABLE_TOPIC = "%s/%s/%s/%s/$settable";
+const char *HOMIE_PROPERTY_RETAINED_TOPIC = "%s/%s/%s/%s/$retained";
+const char *HOMIE_PROPERTY_UNIT_TOPIC = "%s/%s/%s/%s/$unit";
+
+const char *HOMIE_DEVICE_STATE_INIT = "init";
+const char *HOMIE_DEVICE_STATE_READY = "ready";
+
+const char* HOMIE_UNIT_DEGREE_CELSIUS = "°C";
+const char* HOMIE_UNIT_DEGREE_FAHRENHEIT = "°F";
+const char* HOMIE_UNIT_DEGREE = "°";
+const char* HOMIE_UNIT_LITER = "L";
+const char* HOMIE_UNIT_GALON = "gal";
+const char* HOMIE_UNIT_VOLTS = "V"; 
+const char* HOMIE_UNIT_WATT = "W";
+const char* HOMIE_UNIT_AMPERE = "A";
+const char* HOMIE_UNIT_PERCENT = "%";
+const char* HOMIE_UNIT_METER = "m";
+const char* HOMIE_UNIT_FEET = "ft"; 
+const char* HOMIE_UNIT_PASCAL = "Pa";
+const char* HOMIE_UNIT_PSI = "psi";
+const char* HOMIE_UNIT_AMOUNT = "#";
+
 static const char* HOMIE_DATA_TYPE_INTEGER = "integer";
 static const char* HOMIE_DATA_TYPE_FLOAT = "float";
 static const char* HOMIE_DATA_TYPE_BOOLEAN = "boolean";

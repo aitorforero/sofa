@@ -2,42 +2,42 @@
 
 #include <string.h>
 
-const char *HOMIE_DEVICE_SUBSCRIBE_TOPIC = "%s/%s/#";
-const char *HOMIE_DEVICE_HOMIE_TOPIC = "%s/%s/$homie";
-const char *HOMIE_DEVICE_NAME_TOPIC = "%s/%s/$name";
-const char *HOMIE_DEVICE_STATE_TOPIC = "%s/%s/$state";
-const char *HOMIE_DEVICE_EXTENSIONS_TOPIC = "%s/%s/$extensions";
-const char *HOMIE_DEVICE_NODES_TOPIC = "%s/%s/$nodes";
+extern const char *HOMIE_DEVICE_SUBSCRIBE_TOPIC;
+extern const char *HOMIE_DEVICE_HOMIE_TOPIC;
+extern const char *HOMIE_DEVICE_NAME_TOPIC;
+extern const char *HOMIE_DEVICE_STATE_TOPIC;
+extern const char *HOMIE_DEVICE_EXTENSIONS_TOPIC;
+extern const char *HOMIE_DEVICE_NODES_TOPIC;
 
-const char *HOMIE_NODE_NAME_TOPIC = "%s/%s/%s/$name";
-const char *HOMIE_NODE_TYPE_TOPIC = "%s/%s/%s/$type";
-const char *HOMIE_NODE_PROPERTIES_TOPIC = "%s/%s/%s/$properties";
+extern const char *HOMIE_NODE_NAME_TOPIC;
+extern const char *HOMIE_NODE_TYPE_TOPIC;
+extern const char *HOMIE_NODE_PROPERTIES_TOPIC;
 
-const char *HOMIE_PROPERTY_VALUE_TOPIC = "%s/%s/%s/%s";
-const char *HOMIE_PROPERTY_NAME_TOPIC = "%s/%s/%s/%s/$name";
-const char *HOMIE_PROPERTY_DATATYPE_TOPIC = "%s/%s/%s/%s/$datatype";
-const char *HOMIE_PROPERTY_FORMAT_TOPIC = "%s/%s/%s/%s/$format";
-const char *HOMIE_PROPERTY_SETTABLE_TOPIC = "%s/%s/%s/%s/$settable";
-const char *HOMIE_PROPERTY_RETAINED_TOPIC = "%s/%s/%s/%s/$retained";
-const char *HOMIE_PROPERTY_UNIT_TOPIC = "%s/%s/%s/%s/$unit";
+extern const char *HOMIE_PROPERTY_VALUE_TOPIC;
+extern const char *HOMIE_PROPERTY_NAME_TOPIC;
+extern const char *HOMIE_PROPERTY_DATATYPE_TOPIC;
+extern const char *HOMIE_PROPERTY_FORMAT_TOPIC;
+extern const char *HOMIE_PROPERTY_SETTABLE_TOPIC;
+extern const char *HOMIE_PROPERTY_RETAINED_TOPIC;
+extern const char *HOMIE_PROPERTY_UNIT_TOPIC;
 
-const char *HOMIE_DEVICE_STATE_INIT = "init";
-const char *HOMIE_DEVICE_STATE_READY = "ready";
+extern const char *HOMIE_DEVICE_STATE_INIT;
+extern const char *HOMIE_DEVICE_STATE_READY;
 
-const char* HOMIE_UNIT_DEGREE_CELSIUS = "°C";
-const char* HOMIE_UNIT_DEGREE_FAHRENHEIT = "°F";
-const char* HOMIE_UNIT_DEGREE = "°";
-const char* HOMIE_UNIT_LITER = "L";
-const char* HOMIE_UNIT_GALON = "gal";
-const char* HOMIE_UNIT_VOLTS = "V"; 
-const char* HOMIE_UNIT_WATT = "W";
-const char* HOMIE_UNIT_AMPERE = "A";
-const char* HOMIE_UNIT_PERCENT = "%";
-const char* HOMIE_UNIT_METER = "m";
-const char* HOMIE_UNIT_FEET = "ft"; 
-const char* HOMIE_UNIT_PASCAL = "Pa";
-const char* HOMIE_UNIT_PSI = "psi";
-const char* HOMIE_UNIT_AMOUNT = "#";
+extern const char* HOMIE_UNIT_DEGREE_CELSIUS;
+extern const char* HOMIE_UNIT_DEGREE_FAHRENHEIT;
+extern const char* HOMIE_UNIT_DEGREE;
+extern const char* HOMIE_UNIT_LITER;
+extern const char* HOMIE_UNIT_GALON;
+extern const char* HOMIE_UNIT_VOLTS; 
+extern const char* HOMIE_UNIT_WATT;
+extern const char* HOMIE_UNIT_AMPERE;
+extern const char* HOMIE_UNIT_PERCENT;
+extern const char* HOMIE_UNIT_METER;
+extern const char* HOMIE_UNIT_FEET; 
+extern const char* HOMIE_UNIT_PASCAL;
+extern const char* HOMIE_UNIT_PSI;
+extern const char* HOMIE_UNIT_AMOUNT;
 
 enum homie_datatype {
     HOMIE_DATATYPE_INTEGER, 
