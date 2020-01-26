@@ -19,6 +19,9 @@ class Sofa {
         gpio_num_t _pin_led_OK;
         HomieDevice* _sofaDevice;
 
+        char *lastWillState = NULL;
+        char *lastWillStateTopic = NULL;
+
         QueueHandle_t event_queue;
         EventGroupHandle_t wifi_event_group;
         esp_mqtt_client_handle_t client;
@@ -35,6 +38,10 @@ class Sofa {
 
         void inicializa_salidas();
         void inicializa_entradas();
+
+        void publishNode(HomieNode *node);
+        void publishProperty(HomieNode *node, HomieProperty *property);
+        void subscribe();
         
     public:
         Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_led_OK, HomieDevice* _sofaDevice);
@@ -54,8 +61,11 @@ class Sofa {
         void clearConnectedBit();
 
         void mqtt_app_start();
-        void mqtt_publish(char* topic, char* data);
+        void mqtt_publish(const char* topic, const char* data);
         void mqtt_subscribe(char* topic);
+        
+        void publishDevice();
+        void publishConnected();
 };
 
 class SofaEventArgs {

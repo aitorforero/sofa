@@ -57,6 +57,16 @@ enum sofa_state_name
     CONECTADO
 };
 
+enum asiento_state_name
+{
+    IDLE,
+    ABRIR_AUTOMATICO,
+    CERRAR_AUTOMATICO,
+    ABRIR_MANUAL,
+    CERRAR_MANUAL
+};
+
+
 
 class SofaState {
     private:
@@ -109,10 +119,57 @@ class SofaStateSinMQTT:public SofaState {
 class SofaStateAnunciando:public SofaState {
     public:
         SofaStateAnunciando(Sofa* sofa):SofaState(sofa, ANUNCIANDO){};
-        
+        void enter();
+        sofa_state_name handle(sofa_event_flags event);
 };
 
 class SofaStateConectado:public SofaState {
     public:
         SofaStateConectado(Sofa* sofa):SofaState(sofa, CONECTADO){};
+        void enter();
+};
+
+class AsientoState {
+    private:
+        asiento_state_name _name;
+
+    protected:
+        Sofa* _sofa;
+        Asiento* _asiento;
+
+    public:
+        AsientoState(Sofa* sofa, Asiento* asiento, asiento_state_name name):_name(name),_sofa(sofa),_asiento(asiento){};
+        asiento_state_name getName(){return _name;};
+        virtual ~AsientoState(){};
+        virtual void enter(){};
+        virtual asiento_state_name handle(sofa_event_flags event){return getName();};
+        virtual void exit(){};
+
+        bool is(asiento_state_name name);
+
+};
+
+class AsientoStateIdle:public AsientoState {
+    public:
+        AsientoStateIdle(Sofa* sofa, Asiento* asiento):AsientoState(sofa, asiento, IDLE){};
+};
+
+class AsientoStateAbrirAutomatico:public AsientoState {
+    public:
+        AsientoStateAbrirAutomatico(Sofa* sofa, Asiento* asiento):AsientoState(sofa, asiento, ABRIR_AUTOMATICO){};
+};
+
+class AsientoStateAbrirManual:public AsientoState {
+    public:
+        AsientoStateAbrirManual(Sofa* sofa, Asiento* asiento):AsientoState(sofa, asiento, ABRIR_MANUAL){};
+};
+
+class AsientoStateCerrarAutomatico:public AsientoState {
+    public:
+        AsientoStateCerrarAutomatico(Sofa* sofa, Asiento* asiento):AsientoState(sofa, asiento, CERRAR_AUTOMATICO){};
+};
+
+class AsientoStateCerrarManual:public AsientoState {
+    public:
+        AsientoStateCerrarManual(Sofa* sofa, Asiento* asiento):AsientoState(sofa, asiento, CERRAR_MANUAL){};
 };

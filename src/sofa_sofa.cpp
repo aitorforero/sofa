@@ -20,9 +20,12 @@
 #include "sofa_state_machine.hpp"
 #include "sofa_homie_device.hpp"
 
+#define MAX_TOPIC_SIZE 256
+
 static const int CONNECTED_BIT = BIT0;
 
 static const char *TAG = "SOFA_SOFA";
+
 
 void IRAM_ATTR button_isr_handler(void* arg){
     BaseType_t woken = pdFALSE;
@@ -109,6 +112,11 @@ Sofa::Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_l
   ESP_LOGI(TAG, "Inicializando sofa...");
 
   event_queue = xQueueCreate(10,sizeof(int));
+
+  lastWillState = new char[MAX_TOPIC_SIZE];
+  lastWillStateTopic = new char[MAX_TOPIC_SIZE];
+  HomieDevice::getHomieState(HOMIE_STATE_LOST, lastWillState, MAX_TOPIC_SIZE);
+  snprintf(lastWillStateTopic, MAX_TOPIC_SIZE, HOMIE_DEVICE_STATE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID);
 
  
   this->_derecha_abrir_event_args = new SofaEventArgs(this, this->getDerecha()->getPinBotonAbrir());
@@ -306,12 +314,14 @@ void Sofa::mqtt_app_start()
     mqtt_cfg.event_handle = mqtt_event_handler;
     mqtt_cfg.uri = CONFIG_BROKER_URL;
     mqtt_cfg.user_context = this;
+    mqtt_cfg.lwt_msg = lastWillState;
+    mqtt_cfg.lwt_topic = lastWillStateTopic;
 
     client = esp_mqtt_client_init(&mqtt_cfg);
     esp_mqtt_client_start(client);
 }
 
-void Sofa::mqtt_publish(char* topic, char* data){
+void Sofa::mqtt_publish(const char* topic,const char* data){
     int msg_id;
     msg_id = esp_mqtt_client_publish(client, topic, data, 0, 1, 1);    
     ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
@@ -321,4 +331,97 @@ void Sofa::mqtt_subscribe(char* topic){
     int msg_id;
     msg_id = esp_mqtt_client_subscribe(client, topic, 0);
     ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
+}
+
+
+
+ void Sofa::publishProperty(HomieNode *node, HomieProperty *property){
+    char topic[MAX_TOPIC_SIZE];
+    snprintf(topic, 256, HOMIE_PROPERTY_VALUE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID, node->nodeID, property->propertyID);
+    mqtt_publish(topic, property->initialValue);
+    snprintf(topic, 256, HOMIE_PROPERTY_NAME_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID, node->nodeID, property->propertyID);
+    mqtt_publish(topic, property->name);
+    char datatype[15];
+    property->getHomieDataType(datatype, 15);
+    snprintf(topic, 256, HOMIE_PROPERTY_DATATYPE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID, node->nodeID, property->propertyID);
+    mqtt_publish(topic, datatype);
+    snprintf(topic, 256, HOMIE_PROPERTY_FORMAT_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID, node->nodeID, property->propertyID);
+    mqtt_publish(topic, property->format);
+    snprintf(topic, 256, HOMIE_PROPERTY_SETTABLE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID, node->nodeID, property->propertyID);
+    if(property->settable) {
+        mqtt_publish(topic, "true");
+    } else {
+        mqtt_publish(topic, "false");
+    }
+    snprintf(topic, 256, HOMIE_PROPERTY_SETTABLE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID, node->nodeID, property->propertyID);
+    if(property->retained) {
+        mqtt_publish(topic, "true");
+    } else {
+        mqtt_publish(topic, "false");
+    }
+    snprintf(topic, 256, HOMIE_PROPERTY_UNIT_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID, node->nodeID, property->propertyID);
+    mqtt_publish(topic, property->unit);
+};
+
+void Sofa::publishNode(HomieNode *node){
+    char topic[MAX_TOPIC_SIZE];
+    snprintf(topic, MAX_TOPIC_SIZE, HOMIE_NODE_NAME_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID, node->nodeID);
+    mqtt_publish(topic, node->name);
+    snprintf(topic, MAX_TOPIC_SIZE, HOMIE_NODE_TYPE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID, node->nodeID);
+    mqtt_publish(topic, node->nodetype);
+    char properties[MAX_TOPIC_SIZE];
+    node->getProperties(properties, MAX_TOPIC_SIZE);
+    snprintf(topic, MAX_TOPIC_SIZE, HOMIE_DEVICE_NODES_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID);
+    mqtt_publish(topic, properties);
+
+    int length = sizeof(node->properties) / sizeof(node->properties[0]);
+    int i = 0;
+    for(i=0; i<length; i++) {
+        publishProperty(node, &(node->properties[i]));
+    }
+};
+
+void Sofa::publishDevice(){
+    char topic[MAX_TOPIC_SIZE];
+    
+    snprintf(topic, MAX_TOPIC_SIZE, HOMIE_DEVICE_HOMIE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID);
+    mqtt_publish(topic, _sofaDevice->version);
+
+    char state[15];
+    HomieDevice::getHomieState(HOMIE_STATE_INIT, state, 15);
+    snprintf(topic, MAX_TOPIC_SIZE, HOMIE_DEVICE_STATE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID);
+    mqtt_publish(topic, state);   
+
+    snprintf(topic, MAX_TOPIC_SIZE, HOMIE_DEVICE_NAME_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID);
+    mqtt_publish(topic, _sofaDevice->name);
+
+    snprintf(topic, MAX_TOPIC_SIZE, HOMIE_DEVICE_EXTENSIONS_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID);
+    mqtt_publish(topic, "");
+
+    char nodes[MAX_TOPIC_SIZE];
+    _sofaDevice->getNodes(nodes, MAX_TOPIC_SIZE);
+    snprintf(topic, MAX_TOPIC_SIZE, HOMIE_DEVICE_NODES_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID);
+    mqtt_publish(topic, nodes);
+
+    int length = sizeof(_sofaDevice->nodes) / sizeof(_sofaDevice->nodes[0]);
+    int i = 0;
+    for(i=0; i<length; i++) {
+        publishNode(&(_sofaDevice->nodes[i]));
+    };
+
+    subscribe();
+};
+
+void Sofa::subscribe(){
+    char topic[MAX_TOPIC_SIZE];
+    snprintf(topic, 256, HOMIE_DEVICE_SUBSCRIBE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID);
+    mqtt_subscribe(topic);
+};
+
+void Sofa::publishConnected(){
+    char state[15];
+    char topic[MAX_TOPIC_SIZE];
+    HomieDevice::getHomieState(HOMIE_STATE_READY, state, 15);
+    snprintf(topic, MAX_TOPIC_SIZE, HOMIE_DEVICE_STATE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID);
+    mqtt_publish(topic, state);   
 }

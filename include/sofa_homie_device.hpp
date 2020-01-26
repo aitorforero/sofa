@@ -91,5 +91,6 @@ class HomieDevice {
         void getNodes(char* nodesString, size_t size);
         
         static void getHomieState(homie_state state, char* stateString, size_t size);
+        static void getLastWill(homie_state state, char* stateString, size_t size);
         static int getHomieValues(char *topic, char *deviceID, size_t deviceID_size, char *nodeID, size_t nodeID_size, char *propertyID, size_t propertyID_size, char *command, size_t command_size);
 };
