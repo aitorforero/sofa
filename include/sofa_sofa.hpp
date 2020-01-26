@@ -9,6 +9,10 @@
 #include "sofa_state_machine.hpp"
 #include "sofa_homie_device.hpp"
 
+#define SOFA_MENSAJE_PARAR "STOP"
+#define SOFA_MENSAJE_CERRAR "DOWN"
+#define SOFA_MENSAJE_ABRIR "UP"
+
 class SofaEventArgs;
 
 class Sofa {
@@ -51,6 +55,8 @@ class Sofa {
         Asiento* getCentro();
         Asiento* getIzquierda();
         void onButtonPressed(gpio_num_t pin, BaseType_t* woken);
+        void onMQTTMessage(char *topic, char *data);
+        void publishAsientoState(Asiento* asiento, const char * state);
         void buttonTask();
         void encenderOK();
         void apagarOK();

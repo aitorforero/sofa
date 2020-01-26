@@ -115,9 +115,47 @@ void AsientoStateAbrirAutomatico::enter(){
     _asiento->abrir();
 };
 
+asiento_state_name AsientoStateAbrirAutomatico::handle(sofa_event_flags event){
+    asiento_state_name newState = getName();
+
+    if((event & SOFA_EVENT_BOTON_FLAG) == SOFA_EVENT_BOTON_FLAG) {
+        ESP_LOGI(TAG, "Evento boton. Cualquiera, me para");
+        newState = IDLE;
+    } else if(((event & SOFA_EVENT_MQTT_FLAG) == SOFA_EVENT_MQTT_FLAG) && ((event & SOFA_EVENT_MENSAJE_FLAG) == SOFA_EVENT_MENSAJE_FLAG)){
+        if((event & SOFA_EVENT_CERRAR_FLAG) == SOFA_EVENT_CERRAR_FLAG) {
+            ESP_LOGI(TAG, "Mqtt cerrar.");
+            newState = ABRIR_AUTOMATICO; 
+        } else if((event & SOFA_EVENT_PARAR_FLAG) == SOFA_EVENT_PARAR_FLAG) {
+            ESP_LOGI(TAG, "Mqtt Parar.");
+            newState = IDLE; 
+        }
+    }
+
+    return newState;
+};
+
 void AsientoStateCerrarAutomatico::enter(){
     ESP_LOGI(TAG, "Entro en Cerrar Automatico");
     _asiento->cerrar();
+};
+
+asiento_state_name AsientoStateCerrarAutomatico::handle(sofa_event_flags event){
+    asiento_state_name newState = getName();
+
+    if((event & SOFA_EVENT_BOTON_FLAG) == SOFA_EVENT_BOTON_FLAG) {
+        ESP_LOGI(TAG, "Evento boton. Cualquiera, me para");
+        newState = IDLE;
+    } else if(((event & SOFA_EVENT_MQTT_FLAG) == SOFA_EVENT_MQTT_FLAG) && ((event & SOFA_EVENT_MENSAJE_FLAG) == SOFA_EVENT_MENSAJE_FLAG)){
+        if((event & SOFA_EVENT_ABRIR_FLAG) == SOFA_EVENT_ABRIR_FLAG) {
+            ESP_LOGI(TAG, "Mqtt Abrir.");
+            newState = ABRIR_AUTOMATICO; 
+        } else if((event & SOFA_EVENT_PARAR_FLAG) == SOFA_EVENT_PARAR_FLAG) {
+            ESP_LOGI(TAG, "Mqtt Parar.");
+            newState = IDLE; 
+        }
+    }
+
+    return newState;
 };
 
 

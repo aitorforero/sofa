@@ -62,6 +62,7 @@ class AsientoStateAbrirAutomatico:public AsientoState {
     public:
         AsientoStateAbrirAutomatico(Sofa* sofa, Asiento* asiento):AsientoState(sofa, asiento, ABRIR_AUTOMATICO){};
         void enter();
+        asiento_state_name handle(sofa_event_flags event);
 };
 
 class AsientoStateAbrirManual:public AsientoState {
@@ -75,6 +76,7 @@ class AsientoStateCerrarAutomatico:public AsientoState {
     public:
         AsientoStateCerrarAutomatico(Sofa* sofa, Asiento* asiento):AsientoState(sofa, asiento, CERRAR_AUTOMATICO){};
         void enter();
+        asiento_state_name handle(sofa_event_flags event);
 };
 
 class AsientoStateCerrarManual:public AsientoState {

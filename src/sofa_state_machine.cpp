@@ -38,6 +38,8 @@ void SofaStateMachine::onEvent(sofa_event_flags event){
 
 };
 
+
+
 void SofaStateMachine::start(){
     currentState->enter();
 }

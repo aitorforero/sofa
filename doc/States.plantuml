@@ -21,8 +21,10 @@ state conectado {
     cerrar_manual -up-> idle : boton_abrir_pulsado
     cerrar_manual -up-> idle : boton_cerrar_levantado
     abrir_automatico -up-> idle : mqtt_parar
+    abrir_automatico -up-> idle : boton_*_*
     abrir_automatico -right-> cerrar_automatico : mqtt_cerrar
     cerrar_automatico -up-> idle : mqtt_parar
+    cerrar_automatico -up-> idle : boton_*_*
     cerrar_automatico -left-> abrir_automatico : mqtt_abir
 }
 [*] -right-> sin_wifi

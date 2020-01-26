@@ -46,10 +46,15 @@ enum sofa_event_flags
 
     // Estado
     SOFA_EVENT_PULSADO_FLAG   = 0b01,
-    SOFA_EVENT_LEVANTADO_FLAG = 0b10,
-
+    SOFA_EVENT_LEVANTADO_FLAG = 0b10
 
 };
+
+inline sofa_event_flags& operator |=(sofa_event_flags& a, sofa_event_flags b)
+{
+       return a=(sofa_event_flags)(a | b);
+}
+
 
 enum sofa_state_name
 {
