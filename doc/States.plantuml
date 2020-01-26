@@ -16,10 +16,10 @@ state conectado {
     idle --> cerrar_automatico : mqtt_cerrar
     idle --> abrir_manual : boton_abrir_pulsado
     idle --> cerrar_manual : boton_cerrar_pulsado
-    abrir_manual -up-> idle : boton_abrir_soltado
+    abrir_manual -up-> idle : boton_abrir_levantado
     abrir_manual -up-> idle : boton_cerrar_pulsado
     cerrar_manual -up-> idle : boton_abrir_pulsado
-    cerrar_manual -up-> idle : boton_cerrar_soltado
+    cerrar_manual -up-> idle : boton_cerrar_levantado
     abrir_automatico -up-> idle : mqtt_parar
     abrir_automatico -right-> cerrar_automatico : mqtt_cerrar
     cerrar_automatico -up-> idle : mqtt_parar

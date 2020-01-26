@@ -17,6 +17,7 @@ class Sofa {
         Asiento* _centro;
         Asiento* _izquierda;
         gpio_num_t _pin_led_OK;
+        gpio_num_t _pin_buzzer;
         HomieDevice* _sofaDevice;
 
         char *lastWillState = NULL;
@@ -44,7 +45,7 @@ class Sofa {
         void subscribe();
         
     public:
-        Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_led_OK, HomieDevice* _sofaDevice);
+        Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_led_OK, gpio_num_t pin_buzzer, HomieDevice* _sofaDevice);
         ~Sofa();
         Asiento* getDerecha();
         Asiento* getCentro();
@@ -53,6 +54,7 @@ class Sofa {
         void buttonTask();
         void encenderOK();
         void apagarOK();
+        void beep(int count);
 
         SofaStateMachine* getStateMachine();
 

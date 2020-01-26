@@ -108,7 +108,7 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event){
     return ESP_OK;
 }
 
-Sofa::Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_led_OK, HomieDevice* sofaDevice): _derecha(derecha),  _centro(centro), _izquierda(izquierda), _pin_led_OK(pin_led_OK),_sofaDevice(sofaDevice){
+Sofa::Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_led_OK, gpio_num_t pin_buzzer, HomieDevice* sofaDevice): _derecha(derecha),  _centro(centro), _izquierda(izquierda), _pin_led_OK(pin_led_OK), _pin_buzzer(pin_buzzer), _sofaDevice(sofaDevice){
   ESP_LOGI(TAG, "Inicializando sofa...");
 
   event_queue = xQueueCreate(10,sizeof(int));
@@ -218,7 +218,8 @@ void Sofa::inicializa_salidas() {
                           (1ULL<<this->getCentro()->getPinMotorCerrar()) |
                           (1ULL<<this->getIzquierda()->getPinMotorAbrir()) |
                           (1ULL<<this->getIzquierda()->getPinMotorCerrar())|
-                          (1ULL<<this->_pin_led_OK) ;
+                          (1ULL<<this->_pin_led_OK)|
+                          (1ULL<<this->_pin_buzzer) ;
 
   io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
   io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
@@ -268,6 +269,18 @@ void Sofa::encenderOK(){
 
 void Sofa::apagarOK(){
     gpio_set_level(this->_pin_led_OK, 0);  
+}
+
+void Sofa::beep(int count = 1){
+    for(int i = 0;i<count;i++){
+      if(i>0) {
+        // La primera vez no esperamos
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+      }
+      gpio_set_level(this->_pin_buzzer, 1);  
+      vTaskDelay(250 / portTICK_PERIOD_MS);
+      gpio_set_level(this->_pin_buzzer, 0);  
+    }
 }
 
 SofaStateMachine* Sofa::getStateMachine(){

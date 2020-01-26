@@ -4,8 +4,8 @@
 #include "nvs_flash.h"
 #include "esp_log.h"
 
-#include "sofa_asiento.hpp"
 #include "sofa_sofa.hpp"
+#include "sofa_asiento.hpp"
 #include "sofa_homie_device.hpp"
 
 
@@ -72,6 +72,6 @@ extern "C" void app_main(void){
 
     inicializarHomieDevice();
 
-    sofa = new Sofa(&derecha, &centro, &izquierda, GPIO_NUM_23, sofaDevice);
+    sofa = new Sofa(&derecha, &centro, &izquierda, GPIO_NUM_23, GPIO_NUM_22, sofaDevice);
     sofa->encenderOK();
 }
