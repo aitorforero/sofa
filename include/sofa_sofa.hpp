@@ -3,6 +3,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/event_groups.h"
+#include "freertos/semphr.h"
 #include "mqtt_client.h"
 
 #include "sofa_asiento.hpp"
@@ -29,6 +30,7 @@ class Sofa {
 
         QueueHandle_t event_queue;
         EventGroupHandle_t wifi_event_group;
+        SemaphoreHandle_t subscribeSemaphore;
         esp_mqtt_client_handle_t client;
 
 
@@ -46,7 +48,7 @@ class Sofa {
 
         void publishNode(HomieNode *node);
         void publishProperty(HomieNode *node, HomieProperty *property);
-        void subscribe();
+        static void subscribe(void * parameter);
         
     public:
         Sofa(Asiento* derecha,Asiento* centro,Asiento* izquierda, gpio_num_t pin_led_OK, gpio_num_t pin_buzzer, HomieDevice* _sofaDevice);
@@ -71,6 +73,7 @@ class Sofa {
         void mqtt_app_start();
         void mqtt_publish(const char* topic, const char* data);
         void mqtt_subscribe(char* topic);
+        void tickSuscripcion();
         
         void publishDevice();
         void publishConnected();

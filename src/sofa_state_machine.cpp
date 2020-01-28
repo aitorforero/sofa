@@ -94,8 +94,8 @@ sofa_state_name SofaStateSinWifi::handle(sofa_event_flags event){
 };
 
 void SofaStateSinMQTT::enter(){
-    _sofa->beep(2);
     ESP_LOGI(TAG, "Entro en SIN_MQTT");
+    _sofa->beep(2);
     _sofa->mqtt_app_start();
 };
 
@@ -122,6 +122,7 @@ sofa_state_name SofaStateSinMQTT::handle(sofa_event_flags event){
 };
 
 void SofaStateAnunciando::enter(){
+    _sofa->beep(1);
     ESP_LOGI(TAG, "Entro en Anunciando");
     _sofa->publishDevice();
 };
@@ -147,10 +148,11 @@ sofa_state_name SofaStateAnunciando::handle(sofa_event_flags event){
 
 void SofaStateConectado::enter(){
     ESP_LOGI(TAG, "Entro en Conectado");
-    _sofa->publishConnected();
     _sofa->getDerecha()->initializeStateMachine(_sofa);
     _sofa->getCentro()->initializeStateMachine(_sofa);
     _sofa->getIzquierda()->initializeStateMachine(_sofa);
+    _sofa->publishConnected();
+    _sofa->encenderOK();
 };
 
 sofa_state_name SofaStateConectado::handle(sofa_event_flags event){

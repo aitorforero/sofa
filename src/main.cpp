@@ -38,31 +38,27 @@ void inicializarHomieDevice() {
     asientoDerechaNode->nodeID = "ad",
     asientoDerechaNode->name = "Asiento derecha",
     asientoDerechaNode->nodetype = "asiento",
-    asientoDerechaNode->properties = new HomieProperty[1];
-    asientoDerechaNode->properties[0] =  *stateProperty;
+    asientoDerechaNode->properties.push_back(*stateProperty);
 
     asientoCentroNode = new HomieNode();
     asientoCentroNode->nodeID = "ac",
     asientoCentroNode->name = "Asiento centro",
     asientoCentroNode->nodetype = "asiento",
-    asientoCentroNode->properties = new HomieProperty[1];
-    asientoCentroNode->properties[0] =  *stateProperty;
+    asientoCentroNode->properties.push_back(*stateProperty);
 
     asientoIzquierdaNode = new HomieNode();
     asientoIzquierdaNode->nodeID = "ai",
     asientoIzquierdaNode->name = "Asiento izquierda",
     asientoIzquierdaNode->nodetype = "asiento",
-    asientoIzquierdaNode->properties = new HomieProperty[1];
-    asientoIzquierdaNode->properties[0] =  *stateProperty;
+    asientoIzquierdaNode->properties.push_back(*stateProperty);
 
     sofaDevice = new HomieDevice();
     sofaDevice->deviceID = "A4CF126C25BC";
     sofaDevice->name = "Sofa sala";
     sofaDevice->version = "4.0";
-    sofaDevice->nodes = new HomieNode[3]; 
-    sofaDevice->nodes[0] = *asientoDerechaNode;
-    sofaDevice->nodes[1] = *asientoCentroNode;
-    sofaDevice->nodes[2] = *asientoIzquierdaNode;
+    sofaDevice->nodes.push_back(*asientoDerechaNode);
+    sofaDevice->nodes.push_back(*asientoCentroNode);
+    sofaDevice->nodes.push_back(*asientoIzquierdaNode);
 }
 
 extern "C" void app_main(void){
@@ -73,5 +69,4 @@ extern "C" void app_main(void){
     inicializarHomieDevice();
 
     sofa = new Sofa(&derecha, &centro, &izquierda, GPIO_NUM_23, GPIO_NUM_22, sofaDevice);
-    sofa->encenderOK();
 }

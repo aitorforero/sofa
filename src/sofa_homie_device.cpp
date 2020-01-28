@@ -2,7 +2,6 @@
 #include "sofa_homie_device.hpp"
 
 // Global defines 
-const char *HOMIE_DEVICE_SUBSCRIBE_TOPIC = "%s/%s/#";
 const char *HOMIE_DEVICE_HOMIE_TOPIC = "%s/%s/$homie";
 const char *HOMIE_DEVICE_NAME_TOPIC = "%s/%s/$name";
 const char *HOMIE_DEVICE_STATE_TOPIC = "%s/%s/$state";
@@ -81,22 +80,22 @@ void HomieProperty::getHomieDataType(char* dataTypeString, size_t size){
 };
 
 void HomieNode::getProperties(char* propertiesString, size_t size){
-    int length = sizeof(properties) / sizeof(properties[0]);
+    int length = properties.size();
     int i = 0;
-    for(i=0; i<length; i++) {
-        strncat(propertiesString, properties[i].name, size);
-        if(i<length-1) {
+    for (HomieProperty property : properties) {
+        strncat(propertiesString, property.propertyID, size);
+        if(++i < length) {
             strncat(propertiesString, ",", size);
         }
     }    
 };
 
 void HomieDevice::getNodes(char* nodesString, size_t size){
-    int length = sizeof(nodes) / sizeof(nodes[0]);
+    int length = nodes.size();
     int i = 0;
-    for(i=0; i<length; i++) {
-        strncat(nodesString, nodes[i].name, size);
-        if(i<length-1) {
+    for (HomieNode node : nodes) {
+        strncat(nodesString, node.nodeID, size);
+        if(++i < length) {
             strncat(nodesString, ",", size);
         }
     }
@@ -164,3 +163,4 @@ int HomieDevice::getHomieValues(char *topic, char *deviceID, size_t deviceID_siz
    
     return tokenCount;
 };
+

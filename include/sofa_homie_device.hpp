@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string.h>
+#include <vector>
 
-extern const char *HOMIE_DEVICE_SUBSCRIBE_TOPIC;
 extern const char *HOMIE_DEVICE_HOMIE_TOPIC;
 extern const char *HOMIE_DEVICE_NAME_TOPIC;
 extern const char *HOMIE_DEVICE_STATE_TOPIC;
@@ -76,7 +76,7 @@ class HomieNode{
         const char* nodeID;
         const char* name; 
         const char* nodetype;    
-        HomieProperty* properties;
+        std::vector<HomieProperty> properties;
 
         void getProperties(char* propertiesString, size_t size);
 };
@@ -86,7 +86,7 @@ class HomieDevice {
         const char* name;    
         const char* deviceID;
         const char* version; 
-        HomieNode* nodes;
+        std::vector<HomieNode> nodes;
 
         void getNodes(char* nodesString, size_t size);
         
