@@ -57,7 +57,7 @@ class Sofa {
         Asiento* getCentro();
         Asiento* getIzquierda();
         void onButtonPressed(gpio_num_t pin, BaseType_t* woken);
-        void onMQTTMessage(char *topic, char *data);
+        void onMQTTMessage(char *original_topic, int topic_length, char *original_data, int data_length);
         void publishAsientoState(Asiento* asiento, const char * state);
         void buttonTask();
         void encenderOK();

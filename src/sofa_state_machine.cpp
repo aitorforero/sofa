@@ -79,6 +79,7 @@ void SofaStateSinWifi::enter(){
 
 sofa_state_name SofaStateSinWifi::handle(sofa_event_flags event){
     sofa_state_name newState = getName();
+            ESP_LOGW(TAG, "Wifi state handle");
 
     if((event & SOFA_EVENT_WIFI_FLAG) == SOFA_EVENT_WIFI_FLAG) {
         if((event & SOFA_EVENT_DESCONECTADO_FLAG) == SOFA_EVENT_DESCONECTADO_FLAG) {

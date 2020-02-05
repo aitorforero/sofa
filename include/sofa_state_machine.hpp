@@ -55,6 +55,11 @@ inline sofa_event_flags& operator |=(sofa_event_flags& a, sofa_event_flags b)
        return a=(sofa_event_flags)(a | b);
 }
 
+inline sofa_event_flags operator |(sofa_event_flags a, sofa_event_flags b)
+{
+       return (sofa_event_flags)(a | b);
+}
+
 
 enum sofa_state_name
 {

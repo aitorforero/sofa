@@ -51,15 +51,19 @@ esp_err_t wifi_event_handler(void *ctx, system_event_t *event){
 
     switch (event->event_id) {
         case SYSTEM_EVENT_STA_START:
+            ESP_LOGI(TAG, "Evento WIFI: Start");
             esp_wifi_connect();
             break;
         case SYSTEM_EVENT_STA_GOT_IP:
+            ESP_LOGI(TAG, "Evento WIFI: Got IP");
             sofa->setConnectedBit();
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
+            ESP_LOGI(TAG, "Evento WIFI: Deisconnected");
             sofa->clearConnectedBit();
             break;
         default:
+            ESP_LOGI(TAG, "Evento WIFI: Otro %d", event->event_id);
             break;
     }
     return ESP_OK;
@@ -95,7 +99,8 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event){
             ESP_LOGI(TAG, "MQTT_EVENT_DATA");
             printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
             printf("DATA=%.*s\r\n", event->data_len, event->data);
-            sofa->onMQTTMessage(event->topic, event->data);
+
+            sofa->onMQTTMessage(event->topic, event->topic_len, event->data, event->data_len);
             
             break;
         case MQTT_EVENT_ERROR:
@@ -307,12 +312,22 @@ void Sofa::wifi_init(){
     ESP_LOGI(TAG, "start the WIFI SSID:[%s]", wifi_config.sta.ssid);
     ESP_ERROR_CHECK(esp_wifi_start());
     ESP_LOGI(TAG, "Waiting for wifi");
-    xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
+
+    EventBits_t uxBits = 0;
+
+    while((uxBits & CONNECTED_BIT) != 1) {
+        ESP_LOGI(TAG, ".");
+        uxBits = xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, 100 / portTICK_PERIOD_MS);
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
+    
+    ESP_LOGI(TAG, "wifi conectado");
+    state_machine->onEvent((sofa_event_flags)(SOFA_EVENT_WIFI_FLAG | SOFA_EVENT_CONECTADO_FLAG));
+
 }
 
 void Sofa::setConnectedBit(){
   xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
-  state_machine->onEvent((sofa_event_flags)(SOFA_EVENT_WIFI_FLAG | SOFA_EVENT_CONECTADO_FLAG));
 };
 
 void Sofa::clearConnectedBit(){
@@ -435,7 +450,7 @@ void Sofa::subscribe(void * parameter){
     char topic[MAX_TOPIC_SIZE];
     for(HomieNode node :  sofa->_sofaDevice->nodes) {
         for(HomieProperty property : node.properties) {
-            snprintf(topic, 256, HOMIE_PROPERTY_VALUE_TOPIC, CONFIG_ROOT_TOPIC,  sofa->_sofaDevice->deviceID, node.nodeID, property.propertyID);
+            snprintf(topic, 256, HOMIE_PROPERTY_COMMAND_TOPIC, CONFIG_ROOT_TOPIC,  sofa->_sofaDevice->deviceID, node.nodeID, property.propertyID);
              sofa->mqtt_subscribe(topic);
         };
     };
@@ -464,19 +479,37 @@ void Sofa::publishConnected(){
     mqtt_publish(topic, state);   
 }
 
-void Sofa::onMQTTMessage(char *topic, char *data){
-    size_t deviceID_size = 20; // tener en cuenta \0
-    size_t nodeID_size = 3;
-    size_t propertyID_size = 21;
-    size_t command_size = 4;
+void Sofa::onMQTTMessage(char *original_topic, int topic_length, char *original_data, int data_length){
 
-    char deviceID[deviceID_size];
-    char nodeID[nodeID_size];
-    char propertyID[propertyID_size];
-    char command[command_size];
+    char topic[topic_length + 1] = {0}; // tener en cuenta \0
+    char data[data_length + 1] = {0};
+
+    strncpy(topic, original_topic, topic_length);
+    strncpy(data, original_data, data_length);
+
+
+    size_t deviceID_size = 20; 
+    size_t nodeID_size = 20;
+    size_t propertyID_size = 20;
+    size_t command_size = 20;
+
+    char deviceID[deviceID_size + 1] = {0}; // tener en cuenta \0
+    char nodeID[nodeID_size + 1] = {0};
+    char propertyID[propertyID_size + 1] = {0};
+    char command[command_size + 1] = {0};
+
     int tokens = _sofaDevice->getHomieValues(topic, deviceID, deviceID_size, nodeID, nodeID_size, propertyID, propertyID_size, command, command_size);
 
-    sofa_event_flags event = SOFA_EVENT_MQTT_FLAG;
+
+    ESP_LOGI(TAG, "Recividos %d tokens. ", tokens);
+    ESP_LOGI(TAG, "\ttopic:  %s", topic);
+    ESP_LOGI(TAG, "\tdeviceID:  %s", deviceID);
+    ESP_LOGI(TAG, "\tnodeID:  %s", nodeID);
+    ESP_LOGI(TAG, "\tpropertyID:  %s", propertyID);
+    ESP_LOGI(TAG, "\tcommand:  %s", command);
+
+    sofa_event_flags event = SOFA_EVENT_MQTT_FLAG | SOFA_EVENT_MENSAJE_FLAG;
+
 
     if(tokens == 5 && strncmp(command, "set", command_size)==0) {
         if(strncmp(nodeID, _sofaDevice->nodes[0].nodeID, nodeID_size)==0) {
@@ -487,14 +520,16 @@ void Sofa::onMQTTMessage(char *topic, char *data){
             event |= SOFA_EVENT_IZQUIERDA_FLAG;
         } 
 
-        if(strcmp(topic, SOFA_MENSAJE_PARAR)==0) {
+        if(strcmp(data, SOFA_MENSAJE_PARAR)==0) {
             event |= SOFA_EVENT_PARAR_FLAG;
-        } else if(strcmp(topic, SOFA_MENSAJE_ABRIR)==0) {
+        } else if(strcmp(data, SOFA_MENSAJE_ABRIR)==0) {
             event |= SOFA_EVENT_ABRIR_FLAG;
-        } else if(strcmp(topic, SOFA_MENSAJE_CERRAR)==0){
+        } else if(strcmp(data, SOFA_MENSAJE_CERRAR)==0){
             event |= SOFA_EVENT_CERRAR_FLAG;
         }
     }
+
+    ESP_LOGI(TAG, "Event: %d", event);
 
     state_machine->onEvent(event);
 }

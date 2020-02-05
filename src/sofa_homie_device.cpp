@@ -19,6 +19,7 @@ const char *HOMIE_PROPERTY_FORMAT_TOPIC = "%s/%s/%s/%s/$format";
 const char *HOMIE_PROPERTY_SETTABLE_TOPIC = "%s/%s/%s/%s/$settable";
 const char *HOMIE_PROPERTY_RETAINED_TOPIC = "%s/%s/%s/%s/$retained";
 const char *HOMIE_PROPERTY_UNIT_TOPIC = "%s/%s/%s/%s/$unit";
+const char *HOMIE_PROPERTY_COMMAND_TOPIC = "%s/%s/%s/%s/set";
 
 const char *HOMIE_DEVICE_STATE_INIT = "init";
 const char *HOMIE_DEVICE_STATE_READY = "ready";

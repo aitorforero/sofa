@@ -20,6 +20,7 @@ extern const char *HOMIE_PROPERTY_FORMAT_TOPIC;
 extern const char *HOMIE_PROPERTY_SETTABLE_TOPIC;
 extern const char *HOMIE_PROPERTY_RETAINED_TOPIC;
 extern const char *HOMIE_PROPERTY_UNIT_TOPIC;
+extern const char *HOMIE_PROPERTY_COMMAND_TOPIC;
 
 extern const char *HOMIE_DEVICE_STATE_INIT;
 extern const char *HOMIE_DEVICE_STATE_READY;
