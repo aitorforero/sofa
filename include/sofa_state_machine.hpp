@@ -57,7 +57,7 @@ inline sofa_event_flags& operator |=(sofa_event_flags& a, sofa_event_flags b)
 
 inline sofa_event_flags operator |(sofa_event_flags a, sofa_event_flags b)
 {
-       return (sofa_event_flags)(a | b);
+       return (sofa_event_flags)(int(a) | int(b));
 }
 
 
