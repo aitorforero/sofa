@@ -118,7 +118,7 @@ void AsientoStateAbrirAutomatico::enter(){
 asiento_state_name AsientoStateAbrirAutomatico::handle(sofa_event_flags event){
     asiento_state_name newState = getName();
 
-    if((event & SOFA_EVENT_BOTON_FLAG) == SOFA_EVENT_BOTON_FLAG) {
+    if(((event & SOFA_EVENT_BOTON_FLAG) == SOFA_EVENT_BOTON_FLAG) && ((event & SOFA_EVENT_PULSADO_FLAG) == SOFA_EVENT_PULSADO_FLAG)) {
         ESP_LOGI(TAG, "Evento boton. Cualquiera, me para");
         newState = IDLE;
     } else if(((event & SOFA_EVENT_MQTT_FLAG) == SOFA_EVENT_MQTT_FLAG) && ((event & SOFA_EVENT_MENSAJE_FLAG) == SOFA_EVENT_MENSAJE_FLAG)){
@@ -142,8 +142,8 @@ void AsientoStateCerrarAutomatico::enter(){
 asiento_state_name AsientoStateCerrarAutomatico::handle(sofa_event_flags event){
     asiento_state_name newState = getName();
 
-    if((event & SOFA_EVENT_BOTON_FLAG) == SOFA_EVENT_BOTON_FLAG) {
-        ESP_LOGI(TAG, "Evento boton. Cualquiera, me para");
+    if(((event & SOFA_EVENT_BOTON_FLAG) == SOFA_EVENT_BOTON_FLAG) && ((event & SOFA_EVENT_PULSADO_FLAG) == SOFA_EVENT_PULSADO_FLAG)) {
+        ESP_LOGI(TAG, "Evento boton pulsado. Cualquiera, me para");
         newState = IDLE;
     } else if(((event & SOFA_EVENT_MQTT_FLAG) == SOFA_EVENT_MQTT_FLAG) && ((event & SOFA_EVENT_MENSAJE_FLAG) == SOFA_EVENT_MENSAJE_FLAG)){
         if((event & SOFA_EVENT_ABRIR_FLAG) == SOFA_EVENT_ABRIR_FLAG) {

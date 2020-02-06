@@ -27,6 +27,8 @@ static const int CONNECTED_BIT = BIT0;
 
 static const char *TAG = "SOFA_SOFA";
 
+static const int64_t debounceTime = 100;
+
 
 void IRAM_ATTR button_isr_handler(void* arg){
     BaseType_t woken = pdFALSE;
@@ -76,12 +78,12 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event){
     switch (event->event_id) {
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-            sofa->getStateMachine()->onEvent((sofa_event_flags)(SOFA_EVENT_MQTT_FLAG | SOFA_EVENT_CONECTADO_FLAG));
+            sofa->getStateMachine()->onEvent(SOFA_EVENT_MQTT_FLAG | SOFA_EVENT_CONECTADO_FLAG);
             break;
 
         case MQTT_EVENT_DISCONNECTED:
             ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
-            sofa->getStateMachine()->onEvent((sofa_event_flags)(SOFA_EVENT_MQTT_FLAG | SOFA_EVENT_DESCONECTADO_FLAG));
+            sofa->getStateMachine()->onEvent(SOFA_EVENT_MQTT_FLAG | SOFA_EVENT_DESCONECTADO_FLAG);
             break;
 
         case MQTT_EVENT_SUBSCRIBED:
@@ -156,36 +158,50 @@ void Sofa::onButtonPressed(gpio_num_t pin, BaseType_t* pWoken){
 
 void Sofa::buttonTask(){
   ESP_LOGI(TAG, "Comienzo Sofa::buttonTask");
+  int64_t debounceTimers[12] = {0};
+  
   for( ;; ) {
       gpio_num_t pin;
       if(xQueueReceive(this->event_queue, &pin, 0)){
         sofa_event_flags stateMachineEvent = SOFA_EVENT_BOTON_FLAG;
 
+        int salto;
         if(gpio_get_level(pin)==0) {
           ESP_LOGI(TAG, "Pulsado:");
+          salto = 0;
           stateMachineEvent = (sofa_event_flags)(stateMachineEvent | SOFA_EVENT_PULSADO_FLAG);
         } else {
           ESP_LOGI(TAG, "Levantado:");
+          salto = 6;
           stateMachineEvent =  (sofa_event_flags)(stateMachineEvent | SOFA_EVENT_LEVANTADO_FLAG);
         }; 
 
-        if(this->getDerecha()->getPinBotonAbrir()==pin) {
+        int64_t currentTime = esp_timer_get_time() / 1000;
+
+
+        if((this->getDerecha()->getPinBotonAbrir()==pin) && ((currentTime -  debounceTimers[0+salto]) > debounceTime)) {
           ESP_LOGI(TAG, "Derecha Abrir");
+          debounceTimers[0+salto] = currentTime;
           stateMachineEvent = (sofa_event_flags)(stateMachineEvent | SOFA_EVENT_DERECHA_FLAG | SOFA_EVENT_ABRIR_FLAG);
-        } else if(this->getDerecha()->getPinBotonCerrar()==pin) {
+        } else if((this->getDerecha()->getPinBotonCerrar()==pin) && ((currentTime -  debounceTimers[1+salto]) > debounceTime)) {
           ESP_LOGI(TAG, "Derecha Cerrar");
+          debounceTimers[1+salto] = currentTime;
           stateMachineEvent = (sofa_event_flags)(stateMachineEvent | SOFA_EVENT_DERECHA_FLAG | SOFA_EVENT_CERRAR_FLAG);
-        } else if(this->getCentro()->getPinBotonAbrir()==pin) {
+        } else if((this->getCentro()->getPinBotonAbrir()==pin) && ((currentTime -  debounceTimers[2+salto]) > debounceTime)) {
           ESP_LOGI(TAG, "Centro Abrir");
+          debounceTimers[2+salto] = currentTime;
           stateMachineEvent = (sofa_event_flags)(stateMachineEvent | SOFA_EVENT_CENTRO_FLAG | SOFA_EVENT_ABRIR_FLAG);
-        } else if(this->getCentro()->getPinBotonCerrar()==pin) {
+        } else if((this->getCentro()->getPinBotonCerrar()==pin) && ((currentTime -  debounceTimers[3+salto]) > debounceTime)) {
           ESP_LOGI(TAG, "Centro Cerrar");
+          debounceTimers[3+salto] = currentTime;
           stateMachineEvent = (sofa_event_flags)(stateMachineEvent | SOFA_EVENT_CENTRO_FLAG | SOFA_EVENT_CERRAR_FLAG);
-        } else if(this->getIzquierda()->getPinBotonAbrir()==pin) {
+        } else if((this->getIzquierda()->getPinBotonAbrir()==pin)  && ((currentTime -  debounceTimers[4+salto]) > debounceTime)){
           ESP_LOGI(TAG, "Izquierda Abrir");
+          debounceTimers[4+salto] = currentTime;
           stateMachineEvent = (sofa_event_flags)(stateMachineEvent | SOFA_EVENT_IZQUIERDA_FLAG | SOFA_EVENT_ABRIR_FLAG);
-        } else if(this->getIzquierda()->getPinBotonCerrar()==pin) {
+        } else if((this->getIzquierda()->getPinBotonCerrar()==pin)  && ((currentTime -  debounceTimers[5+salto]) > debounceTime)){
           ESP_LOGI(TAG, "Izquierda Cerrar");
+          debounceTimers[5+salto] = currentTime;
           stateMachineEvent = (sofa_event_flags)(stateMachineEvent | SOFA_EVENT_IZQUIERDA_FLAG | SOFA_EVENT_CERRAR_FLAG);
         }
 
@@ -322,7 +338,7 @@ void Sofa::wifi_init(){
     }
     
     ESP_LOGI(TAG, "wifi conectado");
-    state_machine->onEvent((sofa_event_flags)(SOFA_EVENT_WIFI_FLAG | SOFA_EVENT_CONECTADO_FLAG));
+    state_machine->onEvent(SOFA_EVENT_WIFI_FLAG | SOFA_EVENT_CONECTADO_FLAG);
 
 }
 
@@ -332,7 +348,7 @@ void Sofa::setConnectedBit(){
 
 void Sofa::clearConnectedBit(){
   xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
-  state_machine->onEvent((sofa_event_flags)(SOFA_EVENT_WIFI_FLAG | SOFA_EVENT_DESCONECTADO_FLAG));
+  state_machine->onEvent(SOFA_EVENT_WIFI_FLAG | SOFA_EVENT_DESCONECTADO_FLAG);
 };
 
 void Sofa::mqtt_app_start()
@@ -460,7 +476,7 @@ void Sofa::subscribe(void * parameter){
         ESP_LOGI(TAG, "Subscricion %d de %d realizada", i+1, topicCount);
     }
 
-     sofa->getStateMachine()->onEvent((sofa_event_flags)(SOFA_EVENT_MQTT_FLAG | SOFA_EVENT_SUSCRITO_FLAG));
+     sofa->getStateMachine()->onEvent(SOFA_EVENT_MQTT_FLAG | SOFA_EVENT_SUSCRITO_FLAG);
 
 
     vTaskDelete(NULL);
