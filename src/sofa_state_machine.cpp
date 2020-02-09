@@ -159,13 +159,17 @@ void SofaStateConectado::enter(){
 sofa_state_name SofaStateConectado::handle(sofa_event_flags event){
     sofa_state_name newState = getName();
 
+    bool pararTodo = false;
+
     if(((event & SOFA_EVENT_WIFI_FLAG) == SOFA_EVENT_WIFI_FLAG) && ((event & SOFA_EVENT_DESCONECTADO_FLAG) == SOFA_EVENT_DESCONECTADO_FLAG)) {
         ESP_LOGW(TAG, "Wifi desconectado");
         newState = SIN_WIFI;
+        pararTodo = true;
     } else if(((event & SOFA_EVENT_MQTT_FLAG) == SOFA_EVENT_MQTT_FLAG)  && ((event & SOFA_EVENT_DESCONECTADO_FLAG) == SOFA_EVENT_DESCONECTADO_FLAG)) {
         ESP_LOGW(TAG, "MQTT Desconectado");
         newState = SIN_MQTT;
-    } else {
+         pararTodo = true;
+   } else {
         // el resto de casos se lo mandamos al asiento que le corresponda
         if ((event & SOFA_EVENT_DERECHA_FLAG) == SOFA_EVENT_DERECHA_FLAG) {
            _sofa->getDerecha()->getStateMachine()->onEvent(event); 
@@ -174,6 +178,12 @@ sofa_state_name SofaStateConectado::handle(sofa_event_flags event){
         } else if ((event & SOFA_EVENT_IZQUIERDA_FLAG) == SOFA_EVENT_IZQUIERDA_FLAG) {
            _sofa->getIzquierda()->getStateMachine()->onEvent(event); 
         }
+    }
+
+    if(pararTodo) {
+        _sofa->getDerecha()->parar(); 
+        _sofa->getCentro()->parar(); 
+        _sofa->getIzquierda()->parar(); 
     }
 
     return newState;
