@@ -158,7 +158,8 @@ void Sofa::onButtonPressed(gpio_num_t pin, BaseType_t* pWoken){
 
 void Sofa::buttonTask(){
   ESP_LOGI(TAG, "Comienzo Sofa::buttonTask");
-  int64_t debounceTimers[12] = {0};
+  int64_t currentTime = esp_timer_get_time() / 1000;
+  int64_t debounceTimers[12] = {currentTime, currentTime, currentTime, currentTime, currentTime, currentTime, currentTime, currentTime, currentTime, currentTime, currentTime, currentTime};
   
   for( ;; ) {
       gpio_num_t pin;
@@ -176,7 +177,7 @@ void Sofa::buttonTask(){
           stateMachineEvent =  (sofa_event_flags)(stateMachineEvent | SOFA_EVENT_LEVANTADO_FLAG);
         }; 
 
-        int64_t currentTime = esp_timer_get_time() / 1000;
+        currentTime = esp_timer_get_time() / 1000;
 
 
         if((this->getDerecha()->getPinBotonAbrir()==pin) && ((currentTime -  debounceTimers[0+salto]) > debounceTime)) {
@@ -269,7 +270,7 @@ void Sofa::inicializa_entradas() {
 
 
   //Start Task that will handle the Pushbutton
-  xTaskCreate(button_task, "button task", 2048, this, 10, NULL);
+  xTaskCreate(button_task, "button task", 4048, this, 10, NULL);
 
   //install gpio isr service
   ESP_ERROR_CHECK(gpio_install_isr_service(0));
@@ -551,42 +552,24 @@ void Sofa::onMQTTMessage(char *original_topic, int topic_length, char *original_
 }
 
 void Sofa::publishAsientoState(Asiento* asiento, const char * state){
-    // size_t deviceID_size = 20; // tener en cuenta \0
-    // size_t nodeID_size = 3;
-    // size_t propertyID_size = 21;
-    // size_t command_size = 4;
+    HomieNode *node;
+    HomieProperty *property;
+    
+    if(asiento == _derecha) {
+        node = &(_sofaDevice->nodes[0]);
+        property = &(_sofaDevice->nodes[0].properties[0]);
+    } else if(asiento == _centro) {
+        node = &(_sofaDevice->nodes[1]);
+        property = &(_sofaDevice->nodes[1].properties[0]);
+    } else {
+        node = &(_sofaDevice->nodes[2]);
+        property = &(_sofaDevice->nodes[2].properties[0]);
+    }
 
-    // char deviceID[deviceID_size];
-    // char nodeID[nodeID_size];
-    // char propertyID[propertyID_size];
-    // char command[command_size];
-    // int tokens = _sofaDevice->getHomieValues(topic, deviceID, deviceID_size, nodeID, nodeID_size, propertyID, propertyID_size, command, command_size);
 
+    char topic[MAX_TOPIC_SIZE];
+    snprintf(topic, 256, HOMIE_PROPERTY_VALUE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID, node->nodeID, property->propertyID);
+    mqtt_publish(topic, state);
 
-    // char topic[MAX_TOPIC_SIZE];
-    // snprintf(topic, 256, HOMIE_PROPERTY_VALUE_TOPIC, CONFIG_ROOT_TOPIC, _sofaDevice->deviceID, node->nodeID, property->propertyID);
-    // mqtt_publish(topic, property->initialValue);
-
-    // sofa_event_flags event = SOFA_EVENT_MQTT_FLAG;
-
-    // if(tokens == 5 && strncmp(command, "set", command_size)==0) {
-    //     if(strncmp(nodeID, _sofaDevice->nodes[0].nodeID, nodeID_size)==0) {
-    //         event |= SOFA_EVENT_DERECHA_FLAG;
-    //     } else if(strncmp(nodeID, _sofaDevice->nodes[1].nodeID, nodeID_size)==0) {
-    //         event |= SOFA_EVENT_CENTRO_FLAG;
-    //     } else if(strncmp(nodeID, _sofaDevice->nodes[2].nodeID, nodeID_size)==0) {
-    //         event |= SOFA_EVENT_IZQUIERDA_FLAG;
-    //     } 
-
-    //     if(strcmp(topic, SOFA_MENSAJE_PARAR)==0) {
-    //         event |= SOFA_EVENT_PARAR_FLAG;
-    //     } else if(strcmp(topic, SOFA_MENSAJE_ABRIR)==0) {
-    //         event |= SOFA_EVENT_ABRIR_FLAG;
-    //     } else if(strcmp(topic, SOFA_MENSAJE_CERRAR)==0){
-    //         event |= SOFA_EVENT_CERRAR_FLAG;
-    //     }
-    // }
-
-    // state_machine->onEvent(event);
 }
 

@@ -79,6 +79,7 @@ AsientoState* AsientoStateMachine::getState(asiento_state_name name){
 void AsientoStateIdle::enter(){
     ESP_LOGI(TAG, "Entro en Idle");
     _asiento->parar();
+    _sofa->publishAsientoState(_asiento, SOFA_MENSAJE_PARAR);
 };
 
 asiento_state_name AsientoStateIdle::handle(sofa_event_flags event){
@@ -113,6 +114,7 @@ asiento_state_name AsientoStateIdle::handle(sofa_event_flags event){
 void AsientoStateAbrirAutomatico::enter(){
     ESP_LOGI(TAG, "Entro en Abrir Automatico");
     _asiento->abrir();
+    _sofa->publishAsientoState(_asiento, SOFA_MENSAJE_ABRIR);
 };
 
 asiento_state_name AsientoStateAbrirAutomatico::handle(sofa_event_flags event){
@@ -124,7 +126,7 @@ asiento_state_name AsientoStateAbrirAutomatico::handle(sofa_event_flags event){
     } else if(((event & SOFA_EVENT_MQTT_FLAG) == SOFA_EVENT_MQTT_FLAG) && ((event & SOFA_EVENT_MENSAJE_FLAG) == SOFA_EVENT_MENSAJE_FLAG)){
         if((event & SOFA_EVENT_CERRAR_FLAG) == SOFA_EVENT_CERRAR_FLAG) {
             ESP_LOGI(TAG, "Mqtt cerrar.");
-            newState = ABRIR_AUTOMATICO; 
+            newState = CERRAR_AUTOMATICO; 
         } else if((event & SOFA_EVENT_PARAR_FLAG) == SOFA_EVENT_PARAR_FLAG) {
             ESP_LOGI(TAG, "Mqtt Parar.");
             newState = IDLE; 
@@ -137,6 +139,7 @@ asiento_state_name AsientoStateAbrirAutomatico::handle(sofa_event_flags event){
 void AsientoStateCerrarAutomatico::enter(){
     ESP_LOGI(TAG, "Entro en Cerrar Automatico");
     _asiento->cerrar();
+    _sofa->publishAsientoState(_asiento, SOFA_MENSAJE_CERRAR);
 };
 
 asiento_state_name AsientoStateCerrarAutomatico::handle(sofa_event_flags event){
@@ -162,6 +165,7 @@ asiento_state_name AsientoStateCerrarAutomatico::handle(sofa_event_flags event){
 void AsientoStateAbrirManual::enter(){
     ESP_LOGI(TAG, "Entro en Abrir Manual");
     _asiento->abrir();
+    _sofa->publishAsientoState(_asiento, SOFA_MENSAJE_ABRIR);
 };
 
 asiento_state_name AsientoStateAbrirManual::handle(sofa_event_flags event){
@@ -184,6 +188,7 @@ asiento_state_name AsientoStateAbrirManual::handle(sofa_event_flags event){
 void AsientoStateCerrarManual::enter(){
     ESP_LOGI(TAG, "Entro en Cerrar Manual");
     _asiento->cerrar();
+    _sofa->publishAsientoState(_asiento, SOFA_MENSAJE_CERRAR);
 };
 
 asiento_state_name AsientoStateCerrarManual::handle(sofa_event_flags event){
