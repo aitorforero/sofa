@@ -1,0 +1,34 @@
+homie/A4CF126C25BC/$homie 4.0
+homie/A4CF126C25BC/$state ready
+homie/A4CF126C25BC/$name Sofa sala
+homie/A4CF126C25BC/$nodes ad,ac,ai
+
+homie/A4CF126C25BC/ad/$name Asiento derecha
+homie/A4CF126C25BC/ad/$type asiento
+homie/A4CF126C25BC/ad/$properties state
+
+homie/A4CF126C25BC/ad/state/$name State
+homie/A4CF126C25BC/ad/state STOP
+homie/A4CF126C25BC/ad/state/$datatype enum
+homie/A4CF126C25BC/ad/state/$format UP,DOWN,STOP
+homie/A4CF126C25BC/ad/state/$settable true
+
+homie/A4CF126C25BC/ac/$name Asiento centro
+homie/A4CF126C25BC/ac/$type asiento
+homie/A4CF126C25BC/ac/$properties state
+
+homie/A4CF126C25BC/ac/state STOP
+homie/A4CF126C25BC/ac/state/$name State
+homie/A4CF126C25BC/ac/state/$datatype enum
+homie/A4CF126C25BC/ac/state/$format UP,DOWN,STOP
+homie/A4CF126C25BC/ac/state/$settable true
+
+homie/A4CF126C25BC/ai/$name Asiento izquierda
+homie/A4CF126C25BC/ai/$type asiento
+homie/A4CF126C25BC/ai/$properties state
+
+homie/A4CF126C25BC/ai/state UP
+homie/A4CF126C25BC/ai/state/$name State
+homie/A4CF126C25BC/ai/state/$format UP,DOWN,STOP
+homie/A4CF126C25BC/ai/state/$datatype enum
+homie/A4CF126C25BC/ai/state/$settable true

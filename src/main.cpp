@@ -36,25 +36,25 @@ void inicializarHomieDevice() {
 
     asientoDerechaNode = new HomieNode();
     asientoDerechaNode->nodeID = "ad",
-    asientoDerechaNode->name = "Asiento derecha",
+    asientoDerechaNode->name = "AsientoDerecha",
     asientoDerechaNode->nodetype = "asiento",
     asientoDerechaNode->properties.push_back(*stateProperty);
 
     asientoCentroNode = new HomieNode();
     asientoCentroNode->nodeID = "ac",
-    asientoCentroNode->name = "Asiento centro",
+    asientoCentroNode->name = "AsientoCentro",
     asientoCentroNode->nodetype = "asiento",
     asientoCentroNode->properties.push_back(*stateProperty);
 
     asientoIzquierdaNode = new HomieNode();
     asientoIzquierdaNode->nodeID = "ai",
-    asientoIzquierdaNode->name = "Asiento izquierda",
+    asientoIzquierdaNode->name = "AsientoIzquierda",
     asientoIzquierdaNode->nodetype = "asiento",
     asientoIzquierdaNode->properties.push_back(*stateProperty);
 
     sofaDevice = new HomieDevice();
     sofaDevice->deviceID = "A4CF126C25BC";
-    sofaDevice->name = "Sofa sala";
+    sofaDevice->name = "SofaSala";
     sofaDevice->version = "4.0";
     sofaDevice->nodes.push_back(*asientoDerechaNode);
     sofaDevice->nodes.push_back(*asientoCentroNode);
